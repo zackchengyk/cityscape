@@ -1,6 +1,7 @@
 import '../public/style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from "./color"
 
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
@@ -13,28 +14,32 @@ const gridHelper = new THREE.GridHelper();
 scene.add(gridHelper);
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 
-function makeBox(h, x, y) {
-  const boxGeo = new THREE.BoxGeometry(1, h, 1, 1, 1, 1);
+function makeBox(h, x, y, pc, sc) {
+  const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
   const boxTex = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    specular: 0xffffff,
+    color: pc,
+    specular: sc,
   });
   const boxMesh = new THREE.Mesh(boxGeo, boxTex);
   boxMesh.position.set(0 + x, h / 2, 0 + y);
   scene.add(boxMesh);
 }
 
-const ambientLight = new THREE.AmbientLight(0x368880, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.set(-1, 1, -1);
 scene.add(directionalLight);
 
-makeBox(1, 1, 1);
-makeBox(2, 0, 0);
-makeBox(0.5, 1, 0);
-animate();
+for (let i = -10; i <= 10; ++i) {
+    for (let j = -10; j <= 10; ++j) {
+        const h = getNoise(i, j, HEIGHT_SEED)
+        const pc = getPrimaryColor(i, j, 1, 0.5)
+        const sc = getSecondaryColor(i, j, 1, 0.5)
+        makeBox(h, i, j, pc, sc)
+    }
+}
 
 function updateSize(renderer, camera) {
   const factor = 0.01;
@@ -61,3 +66,5 @@ function animate() {
   }
   renderer.render(scene, camera);
 }
+
+animate();
