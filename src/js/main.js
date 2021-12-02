@@ -11,8 +11,8 @@ import {
 ///////////////////////////////
 ///////// Globals /////////////
 ///////////////////////////////
-let xbounds = 10;
-let ybounds = 10;
+let xbounds = 15;
+let ybounds = 15;
 
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
@@ -25,6 +25,13 @@ const gridHelper = new THREE.GridHelper();
 scene.add(gridHelper);
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 const buildingUUIDs = new Map();
+
+// Fog
+{
+  const color = 0x21263a;
+  const density = 0.11;
+  scene.fog = new THREE.FogExp2(color, density);
+}
 
 function makeBox(h, x, y, pc, sc) {
   let coord = {x: x, y: y};
