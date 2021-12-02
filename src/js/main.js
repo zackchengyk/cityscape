@@ -8,6 +8,13 @@ import {
   HEIGHT_SEED,
 } from './color';
 
+// BEGIN TEMPORARY
+import Stats from '../../node_modules/stats.js/src/Stats.js';
+let stats = new Stats();
+stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom);
+// END TEMPORARY
+
 ///////////////////////////////
 ///////// Globals /////////////
 ///////////////////////////////
@@ -120,6 +127,11 @@ function updateSize(renderer, camera) {
 let prevTime = 0;
 function animate(currTime) {
   requestAnimationFrame(animate);
+
+  // BEGIN TEMPORARY
+  stats.begin();
+  // END TEMPORARY
+
   const deltaTime = currTime - prevTime;
   prevTime = currTime;
 
@@ -128,6 +140,10 @@ function animate(currTime) {
   updateBoxes(scene, camera);
 
   renderer.render(scene, camera);
+
+  // BEGIN TEMPORARY
+  stats.end();
+  // END TEMPORARY
 }
 
 // Listeners
