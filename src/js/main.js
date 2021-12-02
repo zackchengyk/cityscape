@@ -18,12 +18,15 @@ document.body.appendChild(stats.dom);
 ///////////////////////////////
 ///////// Globals /////////////
 ///////////////////////////////
-let xbounds = 2;
-let ybounds = 2;
+let xbounds = 6;
+let zbounds = 6;
+let camOffsetX = 1;
+let camOffsetZ = 1;
+let camOffsetY = 1;
 
 const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
-camera.position.set(5, 5, 5);
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -10, 1000);
+camera.position.set(camOffsetX, camOffsetY, camOffsetZ);
 camera.lookAt(0, 0, 0);
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#cityscape'),
@@ -40,8 +43,8 @@ const buildings = new Map();
   scene.fog = new THREE.FogExp2(color, density);
 }
 
-function makeBox(h, x, y, pc, sc) {
-  let coord = {x: x, y: y};
+function makeBox(h, x, z, pc, sc) {
+  let coord = {x: x, z: z};
   if (buildings.has(coord))
     return;
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
@@ -50,7 +53,7 @@ function makeBox(h, x, y, pc, sc) {
     specular: sc,
   });
   const boxMesh = new THREE.Mesh(boxGeo, boxTex);
-  boxMesh.position.set(0 + x, h / 2, 0 + y);
+  boxMesh.position.set(0 + x, h / 2, 0 + z);
   scene.add(boxMesh);
 
   buildings.set(coord, boxMesh);
@@ -64,16 +67,18 @@ directionalLight.position.set(-1, 1, -1);
 scene.add(directionalLight);
 
 let oldX = 0;
-let oldY = 0;
+let oldZ = 0;
 
-function withinBounds(cameraX, cameraY, x, y) {
-  return (x >= cameraX - xbounds && x < cameraX + xbounds &&
-	  y >= cameraY - ybounds && y < cameraY + ybounds);
+function withinBounds(cameraX, cameraZ, x, z) {
+  return (x >= cameraX - xbounds - camOffsetX &&
+	  x < cameraX + xbounds - camOffsetX &&
+	  z >= cameraZ - zbounds - camOffsetZ &&
+	  z < cameraZ + zbounds - camOffsetZ);
 }
 
-function makeBoxes(centerX, centerY) {
-  for (let i = centerX - xbounds; i < centerX + xbounds; i++) {
-    for (let j = centerY - ybounds; j < centerY + ybounds; j++) {
+function makeBoxes(centerX, centerZ) {
+  for (let i = centerX - xbounds - camOffsetX; i < centerX + xbounds - camOffsetX; i++) {
+    for (let j = centerZ - zbounds - camOffsetZ; j < centerZ + zbounds - camOffsetZ; j++) {
       const h = getNoise(i, j, HEIGHT_SEED);
       const pc = getPrimaryColor(i, j, 1, 0.5);
       const sc = getSecondaryColor(i, j, 1, 0.5);
@@ -85,15 +90,15 @@ function makeBoxes(centerX, centerY) {
 function updateBoxes(scene, camera) {
   // TODO: checking whether boxes are within the boundaries is broken
   let x = Math.round(camera.position.x);
-  let y = Math.round(camera.position.y);
-  if (x == oldX && y == oldY)
+  let z = Math.round(camera.position.z);
+  if (x == oldX && z == oldZ)
     return;
   oldX = x;
-  oldY = y;
+  oldZ = z;
   // Clean up irrelevant boxes
   let toDelete = [];
   buildings.forEach((object, coord, map) => {
-    if (!withinBounds(x, y, coord.x, coord.y)) {
+    if (!withinBounds(x, z, coord.x, coord.z)) {
       scene.remove(object);
       object.geometry.dispose();
       object.material.dispose();
@@ -103,7 +108,7 @@ function updateBoxes(scene, camera) {
   toDelete.forEach(coord => { buildings.delete(coord);});
   //renderer.renderLists.dispose();
   // Generate new boxes
-  makeBoxes(x, y);
+  makeBoxes(x, z);
 }
 
 function updateSize(renderer, camera) {
