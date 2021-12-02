@@ -8,6 +8,12 @@ import {
   HEIGHT_SEED,
 } from './color';
 
+///////////////////////////////
+///////// Globals /////////////
+///////////////////////////////
+let xbounds = 10;
+let ybounds = 10;
+
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
 camera.position.set(5, 5, 5);
@@ -18,8 +24,12 @@ const renderer = new THREE.WebGLRenderer({
 const gridHelper = new THREE.GridHelper();
 scene.add(gridHelper);
 const orbitControls = new OrbitControls(camera, renderer.domElement);
+const buildingUUIDs = new Map();
 
 function makeBox(h, x, y, pc, sc) {
+  let coord = {x: x, y: y};
+  if (buildingUUIDs.has(coord))
+    return;
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
   const boxTex = new THREE.MeshPhongMaterial({
     color: pc,
@@ -28,6 +38,8 @@ function makeBox(h, x, y, pc, sc) {
   const boxMesh = new THREE.Mesh(boxGeo, boxTex);
   boxMesh.position.set(0 + x, h / 2, 0 + y);
   scene.add(boxMesh);
+
+  buildingUUIDs.set(coord, boxMesh.uuid);
 }
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -37,13 +49,46 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.set(-1, 1, -1);
 scene.add(directionalLight);
 
-for (let i = -10; i <= 10; ++i) {
-  for (let j = -10; j <= 10; ++j) {
-    const h = getNoise(i, j, HEIGHT_SEED);
-    const pc = getPrimaryColor(i, j, 1, 0.5);
-    const sc = getSecondaryColor(i, j, 1, 0.5);
-    makeBox(h, i, j, pc, sc);
+let oldX = 0;
+let oldY = 0;
+
+function withinBounds(cameraX, cameraY, x, y) {
+  return (x >= cameraX - ybounds && x < cameraX + xbounds &&
+	  y >= cameraY - ybounds && y < cameraY + ybounds);
+}
+
+function makeBoxes(centerX, centerY) {
+  for (let i = centerX - xbounds; i < centerX + xbounds; i++) {
+    for (let j = centerY - ybounds; j < centerY + ybounds; j++) {
+      const h = getNoise(i, j, HEIGHT_SEED);
+      const pc = getPrimaryColor(i, j, 1, 0.5);
+      const sc = getSecondaryColor(i, j, 1, 0.5);
+      makeBox(h, i, j, pc, sc);
+    }
   }
+}
+
+function updateBoxes(scene, camera) {
+  // TODO: checking whether boxes are within the boundaries is broken
+  let x = Math.round(camera.position.x);
+  let y = Math.round(camera.position.y);
+  if (x == oldX && y == oldY)
+    return;
+  oldX = x;
+  oldY = y;
+  // Clean up irrelevant boxes
+  buildingUUIDs.forEach((uuid, coord, map) => {
+    if (!withinBounds(x, y, coord.x, coord.y)) {
+      const object = scene.getObjectByProperty('uuid', uuid);
+      object.geometry.dispose();
+      object.material.dispose();
+      scene.remove(object);
+      map.delete(coord);
+    }
+  });
+  renderer.renderLists.dispose();
+  // Generate new boxes
+  makeBoxes(x, y);
 }
 
 function updateSize(renderer, camera) {
@@ -73,6 +118,7 @@ function animate(currTime) {
 
   updateSize(renderer, camera);
   updateCameraMovement(deltaTime);
+  updateBoxes(scene, camera);
 
   renderer.render(scene, camera);
 }
