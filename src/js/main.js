@@ -18,8 +18,8 @@ document.body.appendChild(stats.dom);
 ///////////////////////////////
 ///////// Globals /////////////
 ///////////////////////////////
-let xbounds = 15;
-let ybounds = 15;
+let xbounds = 2;
+let ybounds = 2;
 
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
@@ -31,7 +31,7 @@ const renderer = new THREE.WebGLRenderer({
 const gridHelper = new THREE.GridHelper();
 scene.add(gridHelper);
 const orbitControls = new OrbitControls(camera, renderer.domElement);
-const buildingUUIDs = new Map();
+const buildings = new Map();
 
 // Fog
 {
@@ -42,7 +42,7 @@ const buildingUUIDs = new Map();
 
 function makeBox(h, x, y, pc, sc) {
   let coord = {x: x, y: y};
-  if (buildingUUIDs.has(coord))
+  if (buildings.has(coord))
     return;
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
   const boxTex = new THREE.MeshPhongMaterial({
@@ -53,7 +53,7 @@ function makeBox(h, x, y, pc, sc) {
   boxMesh.position.set(0 + x, h / 2, 0 + y);
   scene.add(boxMesh);
 
-  buildingUUIDs.set(coord, boxMesh.uuid);
+  buildings.set(coord, boxMesh);
 }
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -67,7 +67,7 @@ let oldX = 0;
 let oldY = 0;
 
 function withinBounds(cameraX, cameraY, x, y) {
-  return (x >= cameraX - ybounds && x < cameraX + xbounds &&
+  return (x >= cameraX - xbounds && x < cameraX + xbounds &&
 	  y >= cameraY - ybounds && y < cameraY + ybounds);
 }
 
@@ -91,16 +91,17 @@ function updateBoxes(scene, camera) {
   oldX = x;
   oldY = y;
   // Clean up irrelevant boxes
-  buildingUUIDs.forEach((uuid, coord, map) => {
+  let toDelete = [];
+  buildings.forEach((object, coord, map) => {
     if (!withinBounds(x, y, coord.x, coord.y)) {
-      const object = scene.getObjectByProperty('uuid', uuid);
+      scene.remove(object);
       object.geometry.dispose();
       object.material.dispose();
-      scene.remove(object);
-      map.delete(coord);
+      toDelete.push(coord);
     }
   });
-  renderer.renderLists.dispose();
+  toDelete.forEach(coord => { buildings.delete(coord);});
+  //renderer.renderLists.dispose();
   // Generate new boxes
   makeBoxes(x, y);
 }
