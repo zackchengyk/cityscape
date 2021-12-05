@@ -44,9 +44,8 @@ const buildings = new Map();
 }
 
 function makeBox(h, x, z, pc, sc) {
-  let coord = {x: x, z: z};
-  if (buildings.has(coord))
-    return;
+  let coord = { x: x, z: z };
+  if (buildings.has(coord)) return;
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
   const boxTex = new THREE.MeshPhongMaterial({
     color: pc,
@@ -54,6 +53,7 @@ function makeBox(h, x, z, pc, sc) {
   });
   const boxMesh = new THREE.Mesh(boxGeo, boxTex);
   boxMesh.position.set(0 + x, h / 2, 0 + z);
+  boxMesh.castShadow = true;
   scene.add(boxMesh);
 
   buildings.set(coord, boxMesh);
@@ -65,6 +65,21 @@ scene.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.set(-1, 1, -1);
 scene.add(directionalLight);
+
+// directional light supposed to represent sunlight
+// TODO: shadows?
+var dl = new THREE.DirectionalLight(0xffffff, 1);
+dl.position.set(0, 4, 10);
+dl.castShadow = true;
+scene.add(dl);
+
+// plane that receives shadows (but does not cast them)
+const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+const planeMaterial = new THREE.MeshStandardMaterial({ color: "0x0000ff" });
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.receiveShadow = true;
+plane.rotation.x = -Math.PI / 2.0;
+scene.add(plane);
 
 let oldX = 0;
 let oldZ = 0;
