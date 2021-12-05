@@ -47,7 +47,7 @@ function makeBox(h, x, z, pc, sc) {
   let coord = { x: x, z: z };
   if (buildings.has(coord)) return;
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
-  const boxTex = new THREE.MeshStandardMaterial({
+  const boxTex = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
   });
