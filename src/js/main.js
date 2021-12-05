@@ -62,16 +62,19 @@ function makeBox(h, x, z, pc, sc) {
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+// TODO: shadows?
+let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.set(-1, 1, -1);
+directionalLight.castShadow = true;
 scene.add(directionalLight);
 
-// directional light supposed to represent sunlight
-// TODO: shadows?
-var dl = new THREE.DirectionalLight(0xffffff, 1);
-dl.position.set(0, 4, 10);
-dl.castShadow = true;
-scene.add(dl);
+// TODO: light doesn't seem to make sense? building reflections are too high
+const pointGeometry = new THREE.SphereGeometry(0.02);
+let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2); // distance, decay
+pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial( { color: 0xff0040 } )));
+pointLight.position.set(0.5, 0.1, 0.5);
+pointLight.castShadow = true;
+scene.add(pointLight);
 
 // plane that receives shadows (but does not cast them)
 const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
