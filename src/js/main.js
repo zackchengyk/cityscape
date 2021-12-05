@@ -47,13 +47,14 @@ function makeBox(h, x, z, pc, sc) {
   let coord = { x: x, z: z };
   if (buildings.has(coord)) return;
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8);
-  const boxTex = new THREE.MeshPhongMaterial({
+  const boxTex = new THREE.MeshStandardMaterial({
     color: pc,
     specular: sc,
   });
   const boxMesh = new THREE.Mesh(boxGeo, boxTex);
   boxMesh.position.set(0 + x, h / 2, 0 + z);
   boxMesh.castShadow = true;
+  boxMesh.receiveShadow = true;
   scene.add(boxMesh);
 
   buildings.set(coord, boxMesh);
@@ -66,23 +67,35 @@ scene.add(ambientLight);
 let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.set(-1, 1, -1);
 directionalLight.castShadow = true;
+//TODO: this shit bonkers
+directionalLight.shadow.camera.left = 10;
+directionalLight.shadow.camera.right = -10;
+directionalLight.shadow.camera.top = 10;
+directionalLight.shadow.camera.bottom = -10;
+directionalLight.shadow.camera.near = -10;
+directionalLight.shadow.camera.far = 1000;
 scene.add(directionalLight);
+
+renderer.shadowMap.enabled = true;
 
 // TODO: light doesn't seem to make sense? building reflections are too high
 const pointGeometry = new THREE.SphereGeometry(0.02);
 let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2); // distance, decay
-pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial( { color: 0xff0040 } )));
+pointLight.add(
+  new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 }))
+);
 pointLight.position.set(0.5, 0.1, 0.5);
 pointLight.castShadow = true;
-scene.add(pointLight);
+// scene.add(pointLight);
 
 // plane that receives shadows (but does not cast them)
 const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
-const planeMaterial = new THREE.MeshStandardMaterial({ color: "0x0000ff" });
+const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.receiveShadow = true;
 plane.rotation.x = -Math.PI / 2.0;
+plane.receiveShadow = true;
 scene.add(plane);
+
 
 let oldX = 0;
 let oldZ = 0;
