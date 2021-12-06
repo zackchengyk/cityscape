@@ -1,3 +1,10 @@
 export default {
-    root: "./src"
-}
+  root: './src',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined, // Makes one JS file on build
+      },
+    },
+  },
+};
