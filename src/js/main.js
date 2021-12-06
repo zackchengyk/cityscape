@@ -1,4 +1,4 @@
-import '../public/style.css';
+import '/public/style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import {
@@ -6,12 +6,12 @@ import {
   getPrimaryColor,
   getSecondaryColor,
   HEIGHT_SEED,
-} from './color';
+} from '/js/color';
 import { setupGamepadAndListeners, updateCameraMovement } from '/js/movement';
+import Stats from '/../node_modules/stats.js/src/Stats.js';
 
 // BEGIN TEMPORARY
-import Stats from '../../node_modules/stats.js/src/Stats.js';
-let stats = new Stats();
+const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 // END TEMPORARY
@@ -83,7 +83,10 @@ renderer.shadowMap.enabled = true;
 const pointGeometry = new THREE.SphereGeometry(0.02);
 let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2); // distance, decay
 pointLight.add(
-  new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 }))
+  new THREE.Mesh(
+    pointGeometry,
+    new THREE.MeshBasicMaterial({ color: 0xff0040 })
+  )
 );
 pointLight.position.set(0.5, 0.1, 0.5);
 pointLight.castShadow = true;
@@ -97,20 +100,29 @@ plane.rotation.x = -Math.PI / 2.0;
 plane.receiveShadow = true;
 scene.add(plane);
 
-
 let oldX = 0;
 let oldZ = 0;
 
 function withinBounds(cameraX, cameraZ, x, z) {
-  return (x >= cameraX - xbounds - camOffsetX &&
-	  x < cameraX + xbounds - camOffsetX &&
-	  z >= cameraZ - zbounds - camOffsetZ &&
-	  z < cameraZ + zbounds - camOffsetZ);
+  return (
+    x >= cameraX - xbounds - camOffsetX &&
+    x < cameraX + xbounds - camOffsetX &&
+    z >= cameraZ - zbounds - camOffsetZ &&
+    z < cameraZ + zbounds - camOffsetZ
+  );
 }
 
 function makeBoxes(centerX, centerZ) {
-  for (let i = centerX - xbounds - camOffsetX; i < centerX + xbounds - camOffsetX; i++) {
-    for (let j = centerZ - zbounds - camOffsetZ; j < centerZ + zbounds - camOffsetZ; j++) {
+  for (
+    let i = centerX - xbounds - camOffsetX;
+    i < centerX + xbounds - camOffsetX;
+    i++
+  ) {
+    for (
+      let j = centerZ - zbounds - camOffsetZ;
+      j < centerZ + zbounds - camOffsetZ;
+      j++
+    ) {
       const h = getNoise(i, j, HEIGHT_SEED);
       const pc = getPrimaryColor(i, j, 1, 0.5);
       const sc = getSecondaryColor(i, j, 1, 0.5);
@@ -123,8 +135,7 @@ function updateBoxes(scene, camera) {
   // TODO: checking whether boxes are within the boundaries is broken
   let x = Math.round(camera.position.x);
   let z = Math.round(camera.position.z);
-  if (x == oldX && z == oldZ)
-    return;
+  if (x == oldX && z == oldZ) return;
   oldX = x;
   oldZ = z;
   // Clean up irrelevant boxes
@@ -137,7 +148,9 @@ function updateBoxes(scene, camera) {
       toDelete.push(coord);
     }
   });
-  toDelete.forEach(coord => { buildings.delete(coord);});
+  toDelete.forEach((coord) => {
+    buildings.delete(coord);
+  });
   //renderer.renderLists.dispose();
   // Generate new boxes
   makeBoxes(x, z);
@@ -166,9 +179,7 @@ let prevTime = 0;
 function animate(currTime) {
   requestAnimationFrame(animate);
 
-  // BEGIN TEMPORARY
-  stats.begin();
-  // END TEMPORARY
+  stats.begin(); // Temporary
 
   const deltaTime = currTime - prevTime;
   prevTime = currTime;
@@ -179,9 +190,7 @@ function animate(currTime) {
 
   renderer.render(scene, camera);
 
-  // BEGIN TEMPORARY
-  stats.end();
-  // END TEMPORARY
+  stats.end(); // Temporary
 }
 
 // Listeners
