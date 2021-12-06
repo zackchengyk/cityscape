@@ -7,6 +7,7 @@ import {
   getSecondaryColor,
   HEIGHT_SEED,
 } from './color';
+import { setupGamepadAndListeners, updateCameraMovement } from '/js/movement';
 
 // BEGIN TEMPORARY
 import Stats from '../../node_modules/stats.js/src/Stats.js';
@@ -173,7 +174,7 @@ function animate(currTime) {
   prevTime = currTime;
 
   updateSize(renderer, camera);
-  updateCameraMovement(deltaTime);
+  updateCameraMovement(deltaTime, camera);
   updateBoxes(scene, camera);
 
   renderer.render(scene, camera);
@@ -189,90 +190,6 @@ function updateSizeOnWindowResize() {
   updateSize(renderer, camera);
 }
 
-// Movement
-const zeroVec3 = () => new THREE.Vector3(0, 0, 0);
-const cameraMovementProperties = {
-  _velocity: zeroVec3(),
-  _maxSpeed: 0.15,
-  _accLam: 0.005,
-  _toZeroAccLamModifier: 0.2,
-};
-function updateCameraMovement(deltaTime) {
-  // Current velocity
-  const currVel = cameraMovementProperties._velocity;
-  const currVelNormalized = currVel.clone().normalize();
-
-  // Target velocity
-  const targetVelNormalized = zeroVec3();
-  for (const key in gamepad) {
-    if (gamepad[key]) {
-      targetVelNormalized.add(keybindings[key]);
-    }
-  }
-  targetVelNormalized.normalize();
-  const targetVel = targetVelNormalized
-    .clone()
-    .multiplyScalar(cameraMovementProperties._maxSpeed);
-
-  // Different acceleration bonuses for different inputs
-  const dotP = targetVelNormalized.dot(currVelNormalized);
-  let directionModifier = 0;
-  if (targetVel.equals(zeroVec3())) {
-    // When decelerating to zero (no player input)
-    directionModifier = cameraMovementProperties._toZeroAccLamModifier;
-  } else {
-    if (dotP > 0) {
-      // When actively accelerating in same direction
-      directionModifier = 1;
-    } else {
-      // When actively accelerating in opposite direction
-      directionModifier = -dotP / 2 + 1;
-    }
-  }
-
-  cameraMovementProperties._velocity = currVel.lerp(
-    targetVel,
-    1 -
-      Math.exp(
-        -cameraMovementProperties._accLam * directionModifier * deltaTime
-      )
-  );
-
-  // Position
-  const displacement = deltaTime * cameraMovementProperties._maxSpeed;
-  camera.position.add(cameraMovementProperties._velocity);
-  camera.updateProjectionMatrix();
-}
-
-// Input mapping
-const keybindings = {
-  ArrowUp: new THREE.Vector3(-1, 0, -1),
-  ArrowDown: new THREE.Vector3(1, 0, 1),
-  ArrowLeft: new THREE.Vector3(-1, 0, 1),
-  ArrowRight: new THREE.Vector3(1, 0, -1),
-  w: new THREE.Vector3(-1, 0, -1),
-  s: new THREE.Vector3(1, 0, 1),
-  a: new THREE.Vector3(-1, 0, 1),
-  d: new THREE.Vector3(1, 0, -1),
-};
-
-// Gamepad
-const gamepad = {};
-
-// Set up gamepad and listeners for gamepad
-for (const key in keybindings) {
-  gamepad[key] = false;
-  window.addEventListener('keydown', (event) => setGamepad(event, key, true));
-  window.addEventListener('keyup', (event) => setGamepad(event, key, false));
-}
-
-// Listeners for gamepad
-function setGamepad(event, key, value) {
-  console.log('hello');
-  if (event.key === key) {
-    gamepad[key] = value;
-  }
-}
-
 // IMPORTANT
+setupGamepadAndListeners();
 animate(0);
