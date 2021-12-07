@@ -40,8 +40,8 @@ const buildings = new Map()
 }
 
 function makeBox(h, x, z, pc, sc) {
-  let coord = { x: x, z: z }
-  if (buildings.has(coord)) return
+  let coordKey = x.toString() + '#' + z.toString()
+  if (buildings.has(coordKey)) return
   const boxGeo = new THREE.BoxGeometry(0.8, h, 0.8)
   const boxTex = new THREE.MeshPhongMaterial({
     color: pc,
@@ -53,7 +53,7 @@ function makeBox(h, x, z, pc, sc) {
   boxMesh.receiveShadow = true
   scene.add(boxMesh)
 
-  buildings.set(coord, boxMesh)
+  buildings.set(coordKey, boxMesh)
 }
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
@@ -122,16 +122,16 @@ function updateBoxes(scene, camera) {
   oldZ = z
   // Clean up irrelevant boxes
   let toDelete = []
-  buildings.forEach((object, coord, map) => {
-    if (!withinBounds(x, z, coord.x, coord.z)) {
+  buildings.forEach((object, key, map) => {
+    if (!withinBounds(x, z, object.position.x, object.position.z)) {
       scene.remove(object)
       object.geometry.dispose()
       object.material.dispose()
-      toDelete.push(coord)
+      toDelete.push(key)
     }
   })
-  toDelete.forEach((coord) => {
-    buildings.delete(coord)
+  toDelete.forEach((key) => {
+    buildings.delete(key)
   })
   //renderer.renderLists.dispose();
   // Generate new boxes
