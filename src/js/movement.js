@@ -5,9 +5,9 @@ const zeroVec3 = () => new THREE.Vector3(0, 0, 0)
 // Movement Properties (Physics)
 const cameraMovementProperties = {
   _velocity: zeroVec3(),
-  _maxSpeed: 0.15,
-  _accLam: 0.005,
-  _toZeroAccLamModifier: 0.2,
+  _maxSpeed: 0.075,
+  _accLam: 0.0025,
+  _toZeroAccLamModifier: 1.25,
 }
 
 // Keybindings
