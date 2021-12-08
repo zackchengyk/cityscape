@@ -8,36 +8,29 @@ const buildings = new Map()
 
 const TILE_WIDTH_HALF = 0.5
 const TILE_HEIGHT_HALF = 0.5
-const CRITICAL_BOUND = 2
 
 function withinBounds(cameraX, cameraZ, boxX, boxZ) {
   const relativeX = boxX - cameraX + camOffsetX
   const relativeZ = boxZ - cameraZ + camOffsetZ
-  const screenSpaceX = (relativeX - relativeZ) * TILE_WIDTH_HALF
-  const screenSpaceY = -(relativeX + relativeZ) * TILE_HEIGHT_HALF
-  const aspectRatioCorrectedForIsometric = window.innerWidth / window.innerHeight / 2
-  return (
-    screenSpaceX < aspectRatioCorrectedForIsometric * CRITICAL_BOUND &&
-    screenSpaceX > -aspectRatioCorrectedForIsometric * CRITICAL_BOUND &&
-    screenSpaceY < CRITICAL_BOUND &&
-    screenSpaceY > -CRITICAL_BOUND
-  )
+  return (5 - relativeX * relativeX - relativeZ * relativeZ) / 4
 }
 
 function generateBox(scene, h, x, z, pc, sc) {
   // Check if a box is already at that location
   let coordKey = x.toString() + '#' + z.toString()
   if (buildings.has(coordKey)) {
-    buildings.get(coordKey).geometry.height = h
+    buildings.get(coordKey).scale.y = h
+    buildings.get(coordKey).position.y = h / 2
     return
   }
   // Generate a box
-  const boxGeometry = new THREE.BoxGeometry(0.8, h, 0.8)
+  const boxGeometry = new THREE.BoxGeometry(0.8, 1, 0.8)
   const boxMaterial = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
+  boxMesh.scale.y = h
   boxMesh.position.set(0 + x, h / 2, 0 + z)
   // Shadow stuff
   boxMesh.castShadow = true
@@ -50,11 +43,13 @@ function generateBox(scene, h, x, z, pc, sc) {
 function generateBoxes(scene, centerX, centerZ, cameraX, cameraZ) {
   for (let boxX = centerX - boundX; boxX <= centerX + boundX; boxX++) {
     for (let boxZ = centerZ - boundZ; boxZ <= centerZ + boundZ; boxZ++) {
-      if (withinBounds(cameraX, cameraZ, boxX, boxZ)) {
+      const scale = withinBounds(cameraX, cameraZ, boxX, boxZ)
+      if (scale > 0) {
+        console.log(scale)
         const h = getNoise(boxX, boxZ, HEIGHT_SEED)
         const pc = getPrimaryColor(boxX, boxZ, 1, 0.5)
         const sc = getSecondaryColor(boxX, boxZ, 1, 0.5)
-        generateBox(scene, h, boxX, boxZ, pc, sc)
+        generateBox(scene, scale * h, boxX, boxZ, pc, sc)
       }
     }
   }
@@ -81,7 +76,7 @@ export function updateBoxes(scene, camera) {
   // Clean up irrelevant boxes
   const toDelete = []
   buildings.forEach((boxMesh, key) => {
-    if (!withinBounds(cameraX, cameraZ, boxMesh.position.x, boxMesh.position.z)) {
+    if (withinBounds(cameraX, cameraZ, boxMesh.position.x, boxMesh.position.z) < 0) {
       scene.remove(boxMesh)
       boxMesh.geometry.dispose()
       boxMesh.material.dispose()
