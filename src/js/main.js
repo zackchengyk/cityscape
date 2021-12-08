@@ -2,35 +2,35 @@ import '/public/style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
+import { setupLighting, updateLighting } from '/js/lighting'
 import { setupGamepadAndListeners, updateCameraMovement } from '/js/movement'
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 
-// BEGIN TEMPORARY
+// STATS
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom)
-// END TEMPORARY
 
-///////////////////////////////
-///////// Globals /////////////
-///////////////////////////////
+// IMPORTANT
+let screenResolution, camera, scene, renderer
+let prevTime = 0
+
+// Box stuff (move to own file later)
 let xbounds = 6
 let zbounds = 6
 let camOffsetX = 1
 let camOffsetZ = 1
 let camOffsetY = 1
-
-const scene = new THREE.Scene()
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -10, 1000)
-camera.position.set(camOffsetX, camOffsetY, camOffsetZ)
-camera.lookAt(0, 0, 0)
-const renderer = new THREE.WebGLRenderer({
-  canvas: document.querySelector('#cityscape'),
-})
-const gridHelper = new THREE.GridHelper()
-scene.add(gridHelper)
-const orbitControls = new OrbitControls(camera, renderer.domElement)
+let oldX = 0
+let oldZ = 0
 const buildings = new Map()
+
+init()
+animate()
+
+///////////////////////////////
+///////// Globals /////////////
+///////////////////////////////
 
 // Fog
 {
@@ -55,43 +55,6 @@ function makeBox(h, x, z, pc, sc) {
 
   buildings.set(coordKey, boxMesh)
 }
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-scene.add(ambientLight)
-
-// TODO: shadows?
-let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-directionalLight.position.set(-1, 1, -1)
-directionalLight.castShadow = true
-//TODO: this shit bonkers
-directionalLight.shadow.camera.left = 10
-directionalLight.shadow.camera.right = -10
-directionalLight.shadow.camera.top = 10
-directionalLight.shadow.camera.bottom = -10
-directionalLight.shadow.camera.near = -10
-directionalLight.shadow.camera.far = 1000
-scene.add(directionalLight)
-
-renderer.shadowMap.enabled = true
-
-// TODO: light doesn't seem to make sense? building reflections are too high
-const pointGeometry = new THREE.SphereGeometry(0.02)
-let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2) // distance, decay
-pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 })))
-pointLight.position.set(0.5, 0.1, 0.5)
-pointLight.castShadow = true
-// scene.add(pointLight);
-
-// plane that receives shadows (but does not cast them)
-const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32)
-const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff })
-const plane = new THREE.Mesh(planeGeometry, planeMaterial)
-plane.rotation.x = -Math.PI / 2.0
-plane.receiveShadow = true
-scene.add(plane)
-
-let oldX = 0
-let oldZ = 0
 
 function withinBounds(cameraX, cameraZ, x, z) {
   return (
@@ -157,11 +120,28 @@ function updateSize(renderer, camera) {
   return needResize
 }
 
-let prevTime = 0
-function animate(currTime) {
+// INIT
+function init() {
+  // Setup basic stuff
+  screenResolution = new THREE.Vector2(window.innerWidth, window.innerHeight)
+  const aspectRatio = screenResolution.x / screenResolution.y
+  setupCameraSceneRenderer(aspectRatio)
+
+  // Setup listeners
+  setupGamepadAndListeners()
+  window.addEventListener('resize', () => updateSize(renderer, camera))
+
+  // Setup geometry
+
+  // Setup lights
+  setupLighting(scene, renderer)
+}
+
+// ANIMATE
+function animate(currTime = 0) {
   requestAnimationFrame(animate)
 
-  stats.begin() // Temporary
+  stats.begin()
 
   const deltaTime = currTime - prevTime
   prevTime = currTime
@@ -169,18 +149,29 @@ function animate(currTime) {
   updateSize(renderer, camera)
   updateCameraMovement(deltaTime, camera)
   updateBoxes(scene, camera)
+  updateLighting('todo')
 
   renderer.render(scene, camera)
 
-  stats.end() // Temporary
+  stats.end()
 }
 
-// Listeners
-window.addEventListener('resize', updateSizeOnWindowResize)
-function updateSizeOnWindowResize() {
-  updateSize(renderer, camera)
+// HELPER
+function setupCameraSceneRenderer(aspectRatio) {
+  // Camera
+  camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, -20, 20)
+  camera.zoom = 0.25
+  camera.position.set(camOffsetX, camOffsetY, camOffsetZ)
+  camera.lookAt(0, 0, 0)
+  // Scene
+  scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x151729)
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('cityscape'), antialias: false })
+  renderer.shadowMap.enabled = true
+  renderer.setSize(screenResolution.x, screenResolution.y)
+  // Temporary below
+  const gridHelper = new THREE.GridHelper()
+  scene.add(gridHelper)
+  const orbitControls = new OrbitControls(camera, renderer.domElement)
 }
-
-// IMPORTANT
-setupGamepadAndListeners()
-animate(0)
