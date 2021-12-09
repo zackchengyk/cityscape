@@ -1,11 +1,16 @@
 import * as THREE from 'three'
 import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
-import { camOffsetX, camOffsetZ } from '/js/config'
+import { camOffsetX, camOffsetZ, genStreets } from '/js/config'
 import { generateOutlineMesh } from '/js/outline'
 
+const streetProbability = 0.2
 let boundX = 6
 let boundZ = 6
 const buildings = new Map()
+const Xstreets = new Set()
+let XstreetsLimits = {low: 0, high: 0}
+const Zstreets = new Set()
+let ZstreetsLimits = {low: 0, high: 0}
 const DEBOUNCE_POSITION_THRESHOLD = 0.01
 const BLOB_RADIUS = 4
 const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
@@ -21,6 +26,7 @@ function withinBounds(cameraX, cameraZ, boxX, boxZ) {
 
 function generateBox(scene, h, x, z, pc, sc) {
   // Check if a box is already at that location
+  if (Xstreets.has(x) || Zstreets.has(z)) return
   let coordKey = x.toString() + '#' + z.toString()
   if (buildings.has(coordKey)) {
     // Update its "height"
@@ -61,6 +67,45 @@ function generateBoxes(scene, centerX, centerZ, cameraX, cameraZ) {
   }
 }
 
+function hasNearbyStreet(v, dir) {
+  for (let cur = v - 5; cur < v + 5; cur++) {
+    if (dir === 0 && Xstreets.has(cur)) return true
+    if (dir === 1 && Zstreets.has(cur)) return true
+  }
+  return false
+}
+
+function generateStreets(centerX, centerZ, cameraX, cameraZ) {
+  for (let boxX = centerX - boundX; boxX < XstreetsLimits.low; boxX++) {
+    if (hasNearbyStreet(boxX, 0)) continue
+    if (Math.random() < streetProbability) {
+      Xstreets.add(boxX)
+    }
+  }
+  XstreetsLimits.low = Math.min(XstreetsLimits.low, centerX - boundX)
+  for (let boxX = XstreetsLimits.high; boxX < centerX + boundX; boxX++) {
+    if (hasNearbyStreet(boxX, 0)) continue
+    if (Math.random() < streetProbability) {
+      Xstreets.add(boxX)
+    }
+  }
+  XstreetsLimits.high = Math.max(XstreetsLimits.high, centerX + boundX)
+  for (let boxZ = centerZ - boundZ; boxZ < ZstreetsLimits.low; boxZ++) {
+    if (hasNearbyStreet(boxZ, 1)) continue
+    if (Math.random() < streetProbability) {
+      Zstreets.add(boxZ)
+    }
+  }
+  ZstreetsLimits.low = Math.min(ZstreetsLimits.low, centerZ - boundZ)
+  for (let boxZ = ZstreetsLimits.high; boxZ < centerZ + boundZ; boxZ++) {
+    if (hasNearbyStreet(boxZ, 1)) continue
+    if (Math.random() < streetProbability) {
+      Zstreets.add(boxZ)
+    }
+  }
+  ZstreetsLimits.high = Math.max(ZstreetsLimits.high, centerZ + boundZ)
+}
+
 export function setupBoxes(scene, camera) {
   updateBoxes(scene, camera)
 }
@@ -98,6 +143,9 @@ export function updateBoxes(scene, camera) {
   toDelete.forEach((key) => {
     buildings.delete(key)
   })
+  if (genStreets) {
+    generateStreets(roundedCameraX - camOffsetX, roundedCameraZ - camOffsetZ, cameraX, cameraZ)
+  }
   // Generate boxes
   generateBoxes(scene, roundedCameraX - camOffsetX, roundedCameraZ - camOffsetZ, cameraX, cameraZ)
 }
