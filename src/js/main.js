@@ -64,15 +64,17 @@ function setupCameraSceneRenderer(aspectRatio) {
   camera.lookAt(0, 0, 0)
   // Scene
   scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x151729)
   // Renderer
-  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('cityscape'), antialias: false })
-  renderer.shadowMap.enabled = true
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('cityscape') })
+  renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.setClearColor(0x47365c)
   renderer.setSize(screenResolution.x, screenResolution.y)
+  // renderer.shadowMap.enabled = true
+
   // Temporary below
   // const gridHelper = new THREE.GridHelper()
   // scene.add(gridHelper)
-  // const orbitControls = new OrbitControls(camera, renderer.domElement)
+  const orbitControls = new OrbitControls(camera, renderer.domElement)
 }
 
 // Resize helper

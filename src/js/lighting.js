@@ -10,17 +10,17 @@ export function setupLighting(scene, renderer) {
   // Directional and shadows
   directionalLight = new THREE.DirectionalLight(0xffffff, 0.5) // todo: factor out
   directionalLight.position.set(-1, 1, -1) // related todo: movement
-  directionalLight.castShadow = true
-  directionalLight.shadow.camera.left = 10
-  directionalLight.shadow.camera.right = -10
-  directionalLight.shadow.camera.top = 10
-  directionalLight.shadow.camera.bottom = -10
-  directionalLight.shadow.camera.near = -10
-  directionalLight.shadow.camera.far = 1000
-  directionalLight.shadow.bias = -0.0001
+  // directionalLight.castShadow = true
+  // directionalLight.shadow.camera.left = 10
+  // directionalLight.shadow.camera.right = -10
+  // directionalLight.shadow.camera.top = 10
+  // directionalLight.shadow.camera.bottom = -10
+  // directionalLight.shadow.camera.near = -10
+  // directionalLight.shadow.camera.far = 1000
+  // directionalLight.shadow.bias = -0.0001
   scene.add(directionalLight)
-  renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  // renderer.shadowMap.enabled = true
+  // renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
   // TODO: light doesn't seem to make sense? building reflections are too high
   // const pointGeometry = new THREE.SphereGeometry(0.02)
@@ -31,12 +31,12 @@ export function setupLighting(scene, renderer) {
   // scene.add(pointLight);
 
   // plane that receives shadows (but does not cast them)
-  const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32)
-  const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff })
-  planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
-  planeMesh.rotation.x = -Math.PI / 2.0
-  planeMesh.receiveShadow = true
-  scene.add(planeMesh)
+  // const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
+  // const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x2773cc })
+  // planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
+  // planeMesh.rotation.x = -Math.PI / 2
+  // planeMesh.receiveShadow = true
+  // scene.add(planeMesh)
 }
 
 export function updateLighting(whateverYouNeed) {

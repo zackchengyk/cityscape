@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
 import { camOffsetX, camOffsetZ } from '/js/config'
+import { generateOutlineMesh } from '/js/outline'
 
 let boundX = 6
 let boundZ = 6
@@ -22,25 +23,28 @@ function generateBox(scene, h, x, z, pc, sc) {
   // Check if a box is already at that location
   let coordKey = x.toString() + '#' + z.toString()
   if (buildings.has(coordKey)) {
-    buildings.get(coordKey).scale.y = h
-    buildings.get(coordKey).position.y = h / 2
+    // Update its "height"
+    buildings.get(coordKey).boxMesh.scale.y = h
+    buildings.get(coordKey).boxMesh.position.y = h / 2
     return
   }
   // Generate a box
-  const boxGeometry = new THREE.BoxGeometry(0.8, 1, 0.8)
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1)
   const boxMaterial = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
-  boxMesh.scale.y = h
+  boxMesh.scale.set(0.8, h, 0.8)
   boxMesh.position.set(0 + x, h / 2, 0 + z)
   // Shadow stuff
   boxMesh.castShadow = true
   boxMesh.receiveShadow = true
+  // Outline stuff
+  const outlineMesh = generateOutlineMesh(boxMesh)
   // Add to map and scene
-  buildings.set(coordKey, boxMesh)
-  scene.add(boxMesh)
+  buildings.set(coordKey, { boxMesh, outlineMesh })
+  scene.add(boxMesh, outlineMesh)
 }
 
 function generateBoxes(scene, centerX, centerZ, cameraX, cameraZ) {
@@ -80,11 +84,14 @@ export function updateBoxes(scene, camera) {
   prevCameraZ = cameraZ
   // Clean up irrelevant boxes
   const toDelete = []
-  buildings.forEach((boxMesh, key) => {
+  buildings.forEach(({ boxMesh, outlineMesh }, key) => {
     if (withinBounds(cameraX, cameraZ, boxMesh.position.x, boxMesh.position.z) < 0) {
       scene.remove(boxMesh)
       boxMesh.geometry.dispose()
       boxMesh.material.dispose()
+      scene.remove(outlineMesh)
+      outlineMesh.geometry.dispose()
+      outlineMesh.material.dispose()
       toDelete.push(key)
     }
   })
