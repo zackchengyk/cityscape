@@ -9,9 +9,6 @@ const DEBOUNCE_POSITION_THRESHOLD = 0.01
 const BLOB_RADIUS = 4
 const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
 
-const TILE_WIDTH_HALF = 0.5
-const TILE_HEIGHT_HALF = 0.5
-
 function withinBounds(cameraX, cameraZ, boxX, boxZ) {
   const relativeX = boxX - cameraX + camOffsetX
   const relativeZ = boxZ - cameraZ + camOffsetZ
