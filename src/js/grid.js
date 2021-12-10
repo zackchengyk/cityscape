@@ -26,7 +26,7 @@ function withinBounds(worldX, worldZ) {
 
 function generateBox(scene, worldX, worldZ, scale) {
   // Get random values
-  const actualHeight = getNoise(worldX, worldZ, HEIGHT_SEED)
+  const actualHeight = Math.ceil(getNoise(worldX, worldZ, HEIGHT_SEED)*2)/2
   const height = actualHeight * scale
   const pc = getPrimaryColor(worldX, worldZ, 1, 0.5)
   const sc = getSecondaryColor(worldX, worldZ, 1, 0.5)
