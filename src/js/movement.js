@@ -2,13 +2,17 @@ import * as THREE from 'three'
 
 const zeroVec3 = () => new THREE.Vector3(0, 0, 0)
 
-// Movement Properties (Physics)
-const cameraMovementProperties = {
+// Movement Properties
+// Fix me maybe?: this is dangerously accessed by many files and functions!
+export const movementProperties = {
   _velocity: zeroVec3(),
+  _worldPosition: zeroVec3(),
   _maxSpeed: 0.075,
   _accLam: 0.0025,
   _toZeroAccLamModifier: 1.25,
 }
+// Fix me maybe?: this is a non-defensive-copying accessor, for speed
+export const focus = movementProperties._worldPosition
 
 // Keybindings
 const keybindings = {
@@ -25,12 +29,11 @@ const keybindings = {
 // Gamepad: map from key to boolean ('is pressed')
 const gamepad = {}
 
-// Animate function: Update camera velocity and position
-export function updateCameraMovement(deltaTime, camera) {
+// Animate function: Update velocity and position
+export function updateMovement(deltaTime) {
   // Get current velocity
-  const currVel = cameraMovementProperties._velocity
+  const currVel = movementProperties._velocity
   const currVelNormalized = currVel.clone().normalize()
-
   // Get target velocity
   const targetVelNormalized = zeroVec3()
   for (const key in gamepad) {
@@ -39,13 +42,13 @@ export function updateCameraMovement(deltaTime, camera) {
     }
   }
   targetVelNormalized.normalize()
-  const targetVel = targetVelNormalized.clone().multiplyScalar(cameraMovementProperties._maxSpeed)
+  const targetVel = targetVelNormalized.clone().multiplyScalar(movementProperties._maxSpeed)
 
   // Get modifier: i.e. different acceleration bonuses for different inputs
   let directionModifier = 0
   if (targetVel.equals(zeroVec3())) {
     // When decelerating to zero
-    directionModifier = cameraMovementProperties._toZeroAccLamModifier
+    directionModifier = movementProperties._toZeroAccLamModifier
   } else {
     const dotP = targetVelNormalized.dot(currVelNormalized)
     if (dotP > 0) {
@@ -58,14 +61,12 @@ export function updateCameraMovement(deltaTime, camera) {
   }
 
   // Update velocity
-  cameraMovementProperties._velocity = currVel.lerp(
+  movementProperties._velocity = currVel.lerp(
     targetVel,
-    1 - Math.exp(-cameraMovementProperties._accLam * directionModifier * deltaTime)
+    1 - Math.exp(-movementProperties._accLam * directionModifier * deltaTime)
   )
-
   // Update position
-  camera.position.add(cameraMovementProperties._velocity)
-  camera.updateProjectionMatrix()
+  movementProperties._worldPosition.add(movementProperties._velocity)
 }
 
 // Init function: Set up gamepad and listeners for gamepad

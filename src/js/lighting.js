@@ -31,7 +31,7 @@ export function setupLighting(scene, renderer) {
   scene.add(pointLight)
 
   //   plane that receives shadows (but does not cast them)
-  const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
+  const planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1)
   const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x2773cc })
   planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
   planeMesh.rotation.x = -Math.PI / 2

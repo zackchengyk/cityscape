@@ -1,9 +1,9 @@
 import '/public/style.css'
 import * as THREE from 'three'
-import { setupBoxes, updateBoxes, updateEntities } from '/js/box'
+import { setupGrid, updateGrid, updateEntities } from '/js/grid'
 import { camOffsetX, camOffsetY, camOffsetZ } from '/js/config'
 import { setupLighting, updateLighting } from '/js/lighting'
-import { setupGamepadAndListeners, updateCameraMovement } from '/js/movement'
+import { setupGamepadAndListeners, updateMovement } from '/js/movement'
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
@@ -30,7 +30,7 @@ function init() {
   window.addEventListener('resize', () => updateSize(renderer, camera))
 
   // Setup geometry
-  setupBoxes(scene, camera)
+  setupGrid(scene, camera)
 
   // Setup lights
   setupLighting(scene, renderer)
@@ -46,9 +46,9 @@ function animate(currTime = 0) {
   prevTime = currTime
 
   updateSize(renderer, camera)
-  updateCameraMovement(deltaTime, camera)
-  updateBoxes(scene, camera)
-  updateEntities(scene, camera)
+  updateMovement(deltaTime)
+  updateGrid(scene)
+  updateEntities(scene)
   updateLighting('todo')
 
   renderer.render(scene, camera)
@@ -73,8 +73,6 @@ function setupCameraSceneRenderer(aspectRatio) {
   // renderer.shadowMap.enabled = true
 
   // Temporary below
-  // const gridHelper = new THREE.GridHelper()
-  // scene.add(gridHelper)
   const orbitControls = new OrbitControls(camera, renderer.domElement)
 }
 
