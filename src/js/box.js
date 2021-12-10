@@ -45,13 +45,18 @@ const carDisp = [
 
 function generateCar(scene, x, z, dir) {
   const car = new THREE.Group();
+  const light = new THREE.PointLight(0xF72119);
+  light.position.x = 0;
+  light.position.y = 0;
+  light.position.z = 0;
+  car.add(light)
+
   const body = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
     new THREE.MeshPhongMaterial({ color: "#ff0000" })
   )
   body.scale.set(0.25, 0.05, 0.15)
   body.position.set(0, 0.025, 0)
-  body.castShadow = true
   body.receiveShadow = true
   car.add(body)
 
@@ -61,7 +66,6 @@ function generateCar(scene, x, z, dir) {
   )
   hood.scale.set(0.15, 0.08, 0.11)
   hood.position.set(0 + 0.03, 0.06, 0)
-  hood.castShadow = true
   hood.receiveShadow = true
   car.add(hood)
 
@@ -71,7 +75,6 @@ function generateCar(scene, x, z, dir) {
   )
   fwheels.scale.set(0.05, 0.05, 0.16)
   fwheels.position.set(0 - 0.055, 0.01, 0)
-  fwheels.castShadow = true
   fwheels.receiveShadow = true
   car.add(fwheels)
 
@@ -81,7 +84,6 @@ function generateCar(scene, x, z, dir) {
   )
   bwheels.scale.set(0.05, 0.05, 0.16)
   bwheels.position.set(0 + 0.055, 0.01, 0)
-  bwheels.castShadow = true
   bwheels.receiveShadow = true
   car.add(bwheels)
 
@@ -272,8 +274,12 @@ export function updateEntities(scene, camera) {
       scene.remove(obj.car)
       obj.car.children.forEach(child => {
 	scene.remove(child)
-	child.geometry.dispose()
-	child.material.dispose()
+	if (child.type === 'PointLight') {
+	  child.dispose()
+	} else {
+	  child.geometry.dispose()
+	  child.material.dispose()
+	}
       })
       toDelete.push(obj)
     }
