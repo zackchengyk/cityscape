@@ -181,7 +181,7 @@ const carDisplacement = [
 ]
 function carWithinBoundsRelative(relativeX, relativeZ) {
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  return BLOB_RADIUS_SQUARED + 5 > distanceSquared
+  return BLOB_RADIUS_SQUARED + 10 > distanceSquared
 }
 
 function generateCar(scene, x, z, dir) {
@@ -228,13 +228,16 @@ function generateCar(scene, x, z, dir) {
   bwheels.receiveShadow = true
   car.add(bwheels)
 
-  car.position.x += x + carDisplacement[dir][0] * Math.random()
-  car.position.z += z + carDisplacement[dir][1] * Math.random()
+  car.position.x += x + carDisplacement[dir][0] * Math.random() - focus.x
+  car.position.z += z + carDisplacement[dir][1] * Math.random() - focus.z
   car.rotateY(carRot[dir])
   scene.add(car)
+  let worldPos = car.position.clone()
+  worldPos.x += focus.x
+  worldPos.z += focus.z
   Cars.add({
     car,
-    _worldPosition: car.position.clone(),
+    _worldPosition: worldPos,
     _velocity: new THREE.Vector3(carVel[dir][0], 0, carVel[dir][1]),
   })
 }
@@ -244,20 +247,24 @@ function generateCars(scene, centerX, centerZ, focusX, focusZ) {
   for (let boxX = centerX - BLOB_RADIUS; boxX <= centerX + BLOB_RADIUS; boxX++) {
     if (Xstreets.has(boxX)) {
       if (Math.random() > carProbability) continue
+      let dist = boxX - centerX
+      let dist_squared = dist * dist - 3
       if (Math.random() > 0.5) {
-        generateCar(scene, boxX, centerZ - BLOB_RADIUS, 0)
+        generateCar(scene, boxX, centerZ - Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), 0)
       } else {
-        generateCar(scene, boxX, centerZ + BLOB_RADIUS, 1)
+        generateCar(scene, boxX, centerZ + Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), 1)
       }
     }
   }
   for (let boxZ = centerZ - BLOB_RADIUS; boxZ <= centerZ + BLOB_RADIUS; boxZ++) {
     if (Zstreets.has(boxZ)) {
       if (Math.random() > carProbability) continue
+      let dist = boxZ - centerZ
+      let dist_squared = dist * dist - 3
       if (Math.random() > 0.5) {
-        generateCar(scene, centerX - BLOB_RADIUS, boxZ, 2)
+        generateCar(scene, centerX - Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), boxZ, 2)
       } else {
-        generateCar(scene, centerX + BLOB_RADIUS, boxZ, 3)
+        generateCar(scene, centerX + Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), boxZ, 3)
       }
     }
   }
