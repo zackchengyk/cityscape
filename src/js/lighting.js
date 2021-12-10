@@ -28,9 +28,9 @@ export function setupLighting(scene, renderer) {
   pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 })))
   pointLight.position.set(0.5, 0.1, 0.5)
   pointLight.castShadow = true
-  scene.add(pointLight);
+  scene.add(pointLight)
 
-//   plane that receives shadows (but does not cast them)
+  //   plane that receives shadows (but does not cast them)
   const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
   const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x2773cc })
   planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
