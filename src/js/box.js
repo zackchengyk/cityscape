@@ -4,9 +4,11 @@ import { camOffsetX, camOffsetZ, genStreets } from '/js/config'
 import { generateOutlineMesh } from '/js/outline'
 
 const streetProbability = 0.2
+const carProbability = 0.1
 let boundX = 6
 let boundZ = 6
 const buildings = new Map()
+const Cars = new Set()
 const Xstreets = new Set()
 let XstreetsLimits = {low: 0, high: 0}
 const Zstreets = new Set()
@@ -22,6 +24,75 @@ function withinBounds(cameraX, cameraZ, boxX, boxZ) {
   const result =
     THREE.MathUtils.smoothstep(BLOB_RADIUS_SQUARED - distanceSquared, 0, BLOB_RADIUS_SQUARED) - 0.05
   return result
+}
+
+const carVel = [
+  [0, 0.03],
+  [0, -0.03],
+  [0.03, 0],
+  [-0.03, 0],
+]
+
+const carRot = [Math.PI/2, -Math.PI/2, Math.PI, 0]
+
+// Drive on the right side of the road
+const carDisp = [
+  [-0.45, 0],
+  [0.45, 0],
+  [0, 0.45],
+  [0, -0.45],
+]
+
+function generateCar(scene, x, z, dir) {
+  const car = new THREE.Group();
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
+    new THREE.MeshPhongMaterial({ color: "#ff0000" })
+  )
+  body.scale.set(0.25, 0.05, 0.15)
+  body.position.set(0, 0.025, 0)
+  body.castShadow = true
+  body.receiveShadow = true
+  car.add(body)
+
+  const hood = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
+    new THREE.MeshPhongMaterial({ color: "#ffffff" })
+  )
+  hood.scale.set(0.15, 0.08, 0.11)
+  hood.position.set(0 + 0.03, 0.06, 0)
+  hood.castShadow = true
+  hood.receiveShadow = true
+  car.add(hood)
+
+  const fwheels = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
+    new THREE.MeshPhongMaterial({ color: "#333333" })
+  )
+  fwheels.scale.set(0.05, 0.05, 0.16)
+  fwheels.position.set(0 - 0.055, 0.01, 0)
+  fwheels.castShadow = true
+  fwheels.receiveShadow = true
+  car.add(fwheels)
+
+  const bwheels = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
+    new THREE.MeshPhongMaterial({ color: "#333333" })
+  )
+  bwheels.scale.set(0.05, 0.05, 0.16)
+  bwheels.position.set(0 + 0.055, 0.01, 0)
+  bwheels.castShadow = true
+  bwheels.receiveShadow = true
+  car.add(bwheels)
+
+  car.position.x += x + carDisp[dir][0] * Math.random()
+  car.position.z += z + carDisp[dir][1] * Math.random()
+  car.rotateY(carRot[dir])
+  scene.add(car)
+  Cars.add({
+    car: car,
+    velX: carVel[dir][0],
+    velZ: carVel[dir][1]})
 }
 
 function generateBox(scene, h, x, z, pc, sc) {
@@ -106,6 +177,30 @@ function generateStreets(centerX, centerZ, cameraX, cameraZ) {
   ZstreetsLimits.high = Math.max(ZstreetsLimits.high, centerZ + boundZ)
 }
 
+function generateCars(scene, centerX, centerZ, cameraX, cameraZ) {
+  if (Math.random() > carProbability) return
+  for (let boxX = centerX-BLOB_RADIUS; boxX <= centerX+BLOB_RADIUS; boxX++) {
+    if (Xstreets.has(boxX)) {
+      if (Math.random() > carProbability) continue
+      if (Math.random() > 0.5) {
+	generateCar(scene, boxX, centerZ - BLOB_RADIUS, 0)
+      } else {
+	generateCar(scene, boxX, centerZ + BLOB_RADIUS, 1)
+      }
+    }
+  }
+  for (let boxZ = centerZ-BLOB_RADIUS; boxZ <= centerZ+BLOB_RADIUS; boxZ++) {
+    if (Zstreets.has(boxZ)) {
+      if (Math.random() > carProbability) continue
+      if (Math.random() > 0.5) {
+	generateCar(scene, centerX - BLOB_RADIUS, boxZ, 2)
+      } else {
+	generateCar(scene, centerX + BLOB_RADIUS, boxZ, 3)
+      }
+    }
+  }
+}
+
 export function setupBoxes(scene, camera) {
   updateBoxes(scene, camera)
 }
@@ -148,4 +243,42 @@ export function updateBoxes(scene, camera) {
   }
   // Generate boxes
   generateBoxes(scene, roundedCameraX - camOffsetX, roundedCameraZ - camOffsetZ, cameraX, cameraZ)
+}
+
+function carWithinBounds(cameraX, cameraZ, boxX, boxZ) {
+  const relativeX = boxX - cameraX + camOffsetX
+  const relativeZ = boxZ - cameraZ + camOffsetZ
+  const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
+  return (BLOB_RADIUS_SQUARED + 5 > distanceSquared)
+}
+
+export function updateEntities(scene, camera) {
+  // Get camera position
+  const cameraX = camera.position.x
+  const cameraZ = camera.position.z
+  const roundedCameraX = Math.round(cameraX)
+  const roundedCameraZ = Math.round(cameraZ)
+  // Move cars
+  Cars.forEach((obj) => {
+    obj.car.position.x += obj.velX
+    obj.car.position.z += obj.velZ
+  })
+  // Generate more entities
+  generateCars(scene, roundedCameraX - camOffsetX, roundedCameraZ - camOffsetZ, cameraX, cameraZ)
+    // Delete irrelevant cars
+  const toDelete = []
+  Cars.forEach((obj) => {
+    if (!carWithinBounds(cameraX, cameraZ, obj.car.position.x, obj.car.position.z)) {
+      scene.remove(obj.car)
+      obj.car.children.forEach(child => {
+	scene.remove(child)
+	child.geometry.dispose()
+	child.material.dispose()
+      })
+      toDelete.push(obj)
+    }
+  })
+  toDelete.forEach((key) => {
+    Cars.delete(key)
+  })
 }

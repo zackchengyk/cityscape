@@ -1,6 +1,6 @@
 import '/public/style.css'
 import * as THREE from 'three'
-import { setupBoxes, updateBoxes } from '/js/box'
+import { setupBoxes, updateBoxes, updateEntities } from '/js/box'
 import { camOffsetX, camOffsetY, camOffsetZ } from '/js/config'
 import { setupLighting, updateLighting } from '/js/lighting'
 import { setupGamepadAndListeners, updateCameraMovement } from '/js/movement'
@@ -48,6 +48,7 @@ function animate(currTime = 0) {
   updateSize(renderer, camera)
   updateCameraMovement(deltaTime, camera)
   updateBoxes(scene, camera)
+  updateEntities(scene, camera)
   updateLighting('todo')
 
   renderer.render(scene, camera)
