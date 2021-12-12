@@ -318,7 +318,6 @@ export function updateEntities(scene) {
       scene.remove(obj.car)
       obj.car.children.forEach((child) => {
         scene.remove(child)
-        console.log(child.type)
         if (child.type === 'SpotLight') {
           child.dispose()
         } else if (child.type === 'Object3D') {
