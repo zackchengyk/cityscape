@@ -4,6 +4,7 @@ import { setupGrid, updateGrid, updateEntities } from '/js/grid'
 import { camOffsetX, camOffsetY, camOffsetZ } from '/js/config'
 import { setupLighting, updateLighting } from '/js/lighting'
 import { setupGamepadAndListeners, updateMovement } from '/js/movement'
+import { outlineScene } from '/js/outline.js'
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
@@ -64,7 +65,10 @@ function animate(currTime = 0) {
   updateEntities(scene)
   updateLighting(scene, params)
 
+  // Render
+  renderer.clear()
   renderer.render(scene, camera)
+  renderer.render(outlineScene, camera)
 
   stats.end()
 }
@@ -81,6 +85,7 @@ function setupCameraSceneRenderer(aspectRatio) {
   // Renderer
   renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('cityscape') })
   renderer.setPixelRatio(window.devicePixelRatio)
+  renderer.autoClear = false
   renderer.setClearColor(0x47365c)
   renderer.setSize(screenResolution.x, screenResolution.y)
   // renderer.shadowMap.enabled = true

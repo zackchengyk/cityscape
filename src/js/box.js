@@ -1,15 +1,18 @@
 import * as THREE from 'three'
+import { outlineScene } from './outline'
 import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
 import { focus } from '/js/movement'
 import { generateOutlineMesh } from '/js/outline'
 
-export function clearBox(removeFromScene, { boxMesh, outlineMesh }) {
+export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2 }) {
   removeFromScene(boxMesh)
   boxMesh.geometry.dispose()
   boxMesh.material.dispose()
-  removeFromScene(outlineMesh)
-  outlineMesh.geometry.dispose()
-  outlineMesh.material.dispose()
+  outlineScene.remove(outlineMesh1)
+  outlineScene.remove(outlineMesh2)
+  outlineMesh1.geometry.dispose()
+  outlineMesh1.material.dispose()
+  outlineMesh2.material.dispose()
 }
 
 export function updateBox({ worldX, worldZ, actualHeight, boxMesh }, scale) {
@@ -29,6 +32,13 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   const boxMaterial = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
+    stencilWrite: true,
+    stencilFunc: THREE.AlwaysStencilFunc,
+    stencilRef: 1,
+    stencilFuncMask: 0xff,
+    stencilFail: THREE.ReplaceStencilOp,
+    stencilZFail: THREE.KeepStencilOp,
+    stencilZPass: THREE.ReplaceStencilOp,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
   boxMesh.scale.set(0.8, height, 0.8)
@@ -37,7 +47,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   boxMesh.castShadow = true
   boxMesh.receiveShadow = true
   // Outline stuff
-  const outlineMesh = generateOutlineMesh(boxMesh)
+  const [outlineMesh1, outlineMesh2] = generateOutlineMesh(boxMesh)
   // Add to map and scene
   addToGridCellMap({
     type: 'box',
@@ -45,8 +55,8 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     worldZ,
     actualHeight,
     boxMesh,
-    outlineMesh,
+    outlineMesh1,
+    outlineMesh2,
   })
   addToScene(boxMesh)
-  addToScene(outlineMesh)
 }
