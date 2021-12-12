@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 let ambientLight, directionalLight, planeMesh
 
+// Init function
 export function setupLighting(scene, renderer) {
   // Ambient
   ambientLight = new THREE.AmbientLight(0xffffff, 0.55) // todo: factor out
@@ -39,6 +40,7 @@ export function setupLighting(scene, renderer) {
   scene.add(planeMesh)
 }
 
+// Animate function
 export function updateLighting(whateverYouNeed) {
   // Todo: animate lighting, maybe move plane as well?
 }

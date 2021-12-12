@@ -1,60 +1,24 @@
 import * as THREE from 'three'
-import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
-import { camOffsetX, camOffsetZ, genStreets } from '/js/config'
-import { generateOutlineMesh } from '/js/outline'
+import { clearBox, updateBox, fillWithBox } from '/js/box'
+import { genStreets } from '/js/config'
 import { focus } from '/js/movement'
 
-const boundX = 10 // FIXME: should be correct and dependent on camera's zoom
-const boundZ = 10 // FIXME: should be correct and dependent on camera's zoom
+// Important
 const gridCellMap = new Map()
-const BLOB_RADIUS = 4
-const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
 
-function xzToKey(x, z) {
-  return x.toString() + '#' + z.toString()
+// Init function
+export function setupGrid(scene) {
+  updateGrid(scene)
 }
 
-// FIXME: rename this function
-function withinBounds(worldX, worldZ) {
-  const relativeX = worldX - focus.x
-  const relativeZ = worldZ - focus.z
-  const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  const result =
-    THREE.MathUtils.smoothstep(BLOB_RADIUS_SQUARED - distanceSquared, 0, BLOB_RADIUS_SQUARED) - 0.05
-  return result
-}
-
-function generateBox(scene, worldX, worldZ, scale) {
-  // Get random values
-  const actualHeight = Math.ceil(getNoise(worldX, worldZ, HEIGHT_SEED)*2)/2
-  const height = actualHeight * scale
-  const pc = getPrimaryColor(worldX, worldZ, 1, 0.5)
-  const sc = getSecondaryColor(worldX, worldZ, 1, 0.5)
-  // Box
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1)
-  const boxMaterial = new THREE.MeshPhongMaterial({
-    color: pc,
-    specular: sc,
-  })
-  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
-  boxMesh.scale.set(0.8, height, 0.8)
-  boxMesh.position.set(worldX - focus.x, height / 2, worldZ - focus.z)
-  // Shadow stuff
-  boxMesh.castShadow = true
-  boxMesh.receiveShadow = true
-  // Outline stuff
-  const outlineMesh = generateOutlineMesh(boxMesh)
-  // Add to map and scene
-  gridCellMap.set(xzToKey(worldX, worldZ), { worldX, worldZ, actualHeight, boxMesh, outlineMesh })
-  scene.add(boxMesh, outlineMesh)
-}
-
+// Animate function
+const BOUND_X = 10 // FIXME: should be correct and dependent on camera's zoom
+const BOUND_Z = 10 // FIXME: should be correct and dependent on camera's zoom
+const DEBOUNCE_POSITION_THRESHOLD = 0.01
 let prevFocusX = Infinity
 let prevFocusZ = Infinity
-const DEBOUNCE_POSITION_THRESHOLD = 0.01
-
 export function updateGrid(scene) {
-  // Note: this ASSUMES that all visible grid cells are within [-boundX, boundX], etc
+  // Note: this ASSUMES that all visible grid cells are within [-boundX, boundX], [-boundZ, boundZ]
 
   // Get position
   const { x: focusX, z: focusZ } = focus
@@ -80,14 +44,14 @@ export function updateGrid(scene) {
   }
 
   // Iterate over grid cells
-  for (let worldX = roundedFocusX - boundX; worldX <= roundedFocusX + boundX; worldX++) {
-    for (let worldZ = roundedFocusZ - boundZ; worldZ <= roundedFocusZ + boundZ; worldZ++) {
+  for (let worldX = roundedFocusX - BOUND_X; worldX <= roundedFocusX + BOUND_X; worldX++) {
+    for (let worldZ = roundedFocusZ - BOUND_Z; worldZ <= roundedFocusZ + BOUND_Z; worldZ++) {
       const scale = withinBounds(worldX, worldZ)
       const gridCellKey = xzToKey(worldX, worldZ)
       if (scale > 0) {
         if (gridCellMap.has(gridCellKey)) {
           // Update currently occupied grid cell
-          updateGridCell(scene, gridCellMap.get(gridCellKey), scale)
+          updateGridCell(gridCellMap.get(gridCellKey), scale)
         } else {
           // Fill currently empty grid cell
           fillGridCell(scene, worldX, worldZ, scale, gridCellKey)
@@ -102,33 +66,82 @@ export function updateGrid(scene) {
   kvPairsToDelete.forEach((key) => gridCellMap.delete(key))
 }
 
-export function setupGrid(scene) {
-  updateGrid(scene)
-}
-
+// Helpers for updateGrid
 function clearGridCell(scene, gridCellValue) {
-  const { boxMesh, outlineMesh } = gridCellValue
-  // Extensible, though right now the hashmap object can only have boxes and their outlines
-  scene.remove(boxMesh)
-  boxMesh.geometry.dispose()
-  boxMesh.material.dispose()
-  scene.remove(outlineMesh)
-  outlineMesh.geometry.dispose()
-  outlineMesh.material.dispose()
+  const removeFromScene = (x) => scene.remove(x)
+
+  switch (gridCellValue.type) {
+    case 'street': {
+      break
+    }
+    case 'box': {
+      clearBox(removeFromScene, gridCellValue)
+      break
+    }
+    default: {
+      console.error('what are you trying to clear from this grid cell with lol')
+      break
+    }
+  }
 }
 
-function updateGridCell(_, gridCellValue, scale) {
-  const { worldX, worldZ, actualHeight, boxMesh } = gridCellValue
-  // Extensible, though right now the hashmap object can only have boxes and their outlines
-  const height = actualHeight * scale
-  boxMesh.scale.y = height
-  boxMesh.position.set(worldX - focus.x, height / 2, worldZ - focus.z)
+// Helpers for updateGrid
+function updateGridCell(gridCellValue, scale) {
+  switch (gridCellValue.type) {
+    case 'street': {
+      break
+    }
+    case 'box': {
+      updateBox(gridCellValue, scale)
+      break
+    }
+    default: {
+      console.error('what are you trying to update this grid cell with lol')
+      break
+    }
+  }
 }
 
+// Helpers for updateGrid
 function fillGridCell(scene, worldX, worldZ, scale, gridCellKey) {
-  // Extensible, though right now the only thing we make is boxes and streets
-  if (isStreetPosition(worldX, worldZ)) return
-  generateBox(scene, worldX, worldZ, scale, gridCellKey)
+  const type = isStreetPosition(worldX, worldZ) ? 'street' : 'box'
+
+  switch (type) {
+    case 'street': {
+      break
+    }
+    case 'box': {
+      fillWithBox(
+        (x) => scene.add(x),
+        (x) => gridCellMap.set(gridCellKey, x),
+        worldX,
+        worldZ,
+        scale
+      )
+      break
+    }
+    default: {
+      console.error('what are you trying to fill this grid cell with lol')
+      break
+    }
+  }
+}
+
+// Utility function
+function xzToKey(x, z) {
+  return x.toString() + '#' + z.toString()
+}
+
+// FIXME: rename this function
+const BLOB_RADIUS = 5
+const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
+function withinBounds(worldX, worldZ) {
+  const relativeX = worldX - focus.x
+  const relativeZ = worldZ - focus.z
+  const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
+  const result =
+    THREE.MathUtils.smoothstep(BLOB_RADIUS_SQUARED - distanceSquared, 0, BLOB_RADIUS_SQUARED) - 0.05
+  return result
 }
 
 //
@@ -325,34 +338,34 @@ function hasNearbyStreet(v, dir) {
 }
 
 export function generateStreets(centerX, centerZ) {
-  for (let boxX = centerX - boundX; boxX < XstreetsLimits.low; boxX++) {
+  for (let boxX = centerX - BOUND_X; boxX < XstreetsLimits.low; boxX++) {
     if (hasNearbyStreet(boxX, 0)) continue
     if (Math.random() < streetProbability) {
       Xstreets.add(boxX)
     }
   }
-  XstreetsLimits.low = Math.min(XstreetsLimits.low, centerX - boundX)
-  for (let boxX = XstreetsLimits.high; boxX < centerX + boundX; boxX++) {
+  XstreetsLimits.low = Math.min(XstreetsLimits.low, centerX - BOUND_X)
+  for (let boxX = XstreetsLimits.high; boxX < centerX + BOUND_X; boxX++) {
     if (hasNearbyStreet(boxX, 0)) continue
     if (Math.random() < streetProbability) {
       Xstreets.add(boxX)
     }
   }
-  XstreetsLimits.high = Math.max(XstreetsLimits.high, centerX + boundX)
-  for (let boxZ = centerZ - boundZ; boxZ < ZstreetsLimits.low; boxZ++) {
+  XstreetsLimits.high = Math.max(XstreetsLimits.high, centerX + BOUND_X)
+  for (let boxZ = centerZ - BOUND_Z; boxZ < ZstreetsLimits.low; boxZ++) {
     if (hasNearbyStreet(boxZ, 1)) continue
     if (Math.random() < streetProbability) {
       Zstreets.add(boxZ)
     }
   }
-  ZstreetsLimits.low = Math.min(ZstreetsLimits.low, centerZ - boundZ)
-  for (let boxZ = ZstreetsLimits.high; boxZ < centerZ + boundZ; boxZ++) {
+  ZstreetsLimits.low = Math.min(ZstreetsLimits.low, centerZ - BOUND_Z)
+  for (let boxZ = ZstreetsLimits.high; boxZ < centerZ + BOUND_Z; boxZ++) {
     if (hasNearbyStreet(boxZ, 1)) continue
     if (Math.random() < streetProbability) {
       Zstreets.add(boxZ)
     }
   }
-  ZstreetsLimits.high = Math.max(ZstreetsLimits.high, centerZ + boundZ)
+  ZstreetsLimits.high = Math.max(ZstreetsLimits.high, centerZ + BOUND_Z)
 }
 
 export function isStreetPosition(x, z) {

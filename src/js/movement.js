@@ -29,6 +29,19 @@ const keybindings = {
 // Gamepad: map from key to boolean ('is pressed')
 const gamepad = {}
 
+// Init function: Set up gamepad and listeners for gamepad
+export function setupGamepadAndListeners() {
+  function toggleGamepadValue(event, key, value) {
+    if (event.key === key) {
+      gamepad[key] = value
+    }
+  }
+  for (const key in keybindings) {
+    gamepad[key] = false
+    window.addEventListener('keydown', (event) => toggleGamepadValue(event, key, true))
+    window.addEventListener('keyup', (event) => toggleGamepadValue(event, key, false))
+  }
+}
 // Animate function: Update velocity and position
 export function updateMovement(deltaTime) {
   // Get current velocity
@@ -67,18 +80,4 @@ export function updateMovement(deltaTime) {
   )
   // Update position
   movementProperties._worldPosition.add(movementProperties._velocity)
-}
-
-// Init function: Set up gamepad and listeners for gamepad
-export function setupGamepadAndListeners() {
-  function toggleGamepadValue(event, key, value) {
-    if (event.key === key) {
-      gamepad[key] = value
-    }
-  }
-  for (const key in keybindings) {
-    gamepad[key] = false
-    window.addEventListener('keydown', (event) => toggleGamepadValue(event, key, true))
-    window.addEventListener('keyup', (event) => toggleGamepadValue(event, key, false))
-  }
 }
