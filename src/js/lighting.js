@@ -22,13 +22,13 @@ export function setupLighting(scene, renderer) {
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-  // TODO: light doesn't seem to make sense? building reflections are too high
-  const pointGeometry = new THREE.SphereGeometry(0.02)
-  let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2) // distance, decay
-  pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 })))
-  pointLight.position.set(0.5, 0.1, 0.5)
-  pointLight.castShadow = true
-  scene.add(pointLight)
+  // // TODO: light doesn't seem to make sense? building reflections are too high
+  // const pointGeometry = new THREE.SphereGeometry(0.02)
+  // let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2) // distance, decay
+  // pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 })))
+  // pointLight.position.set(0.5, 0.1, 0.5)
+  // pointLight.castShadow = true
+  // scene.add(pointLight)
 
   //   plane that receives shadows (but does not cast them)
   const planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1)
