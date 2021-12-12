@@ -22,3 +22,7 @@ And here are some links:
 ## Project Plan (Due: 11/30)
 
 TODO: This
+
+After cloning, navigate to folder and run the following
+`npm install` `npm run dev`
+http://localhost:3000/
