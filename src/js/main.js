@@ -6,11 +6,18 @@ import { setupLighting, updateLighting } from '/js/lighting'
 import { setupGamepadAndListeners, updateMovement } from '/js/movement'
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 
 // Stats
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom)
+
+// Default params
+const params = {
+  shadows: true,
+  timeOfDay: 12,
+}
 
 // Important
 let screenResolution, camera, scene, renderer
@@ -24,6 +31,12 @@ function init() {
   screenResolution = new THREE.Vector2(window.innerWidth, window.innerHeight)
   const aspectRatio = screenResolution.x / screenResolution.y
   setupCameraSceneRenderer(aspectRatio)
+
+  // Setup GUI
+  const gui = new GUI()
+  gui.add(params, 'timeOfDay', 0, 24)
+  gui.add(params, 'shadows')
+  gui.open()
 
   // Setup listeners
   setupGamepadAndListeners()
@@ -49,7 +62,7 @@ function animate(currTime = 0) {
   updateMovement(deltaTime)
   updateGrid(scene)
   updateEntities(scene)
-  updateLighting('todo')
+  updateLighting(scene, params)
 
   renderer.render(scene, camera)
 

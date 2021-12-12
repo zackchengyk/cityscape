@@ -39,6 +39,9 @@ export function setupLighting(scene, renderer) {
   scene.add(planeMesh)
 }
 
-export function updateLighting(whateverYouNeed) {
+export function updateLighting(scene, params) {
   // Todo: animate lighting, maybe move plane as well?
+  // breaks the thing lol
+  // directionalLight.castShadow = true
+  // pointLight.castShadow = true
 }
