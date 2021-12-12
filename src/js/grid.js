@@ -173,7 +173,7 @@ function withinBounds(worldX, worldZ) {
 //
 // Car stuff
 
-const carProbability = 0.1
+const carProbability = 0.07
 const Cars = new Set()
 
 const carVel = [
@@ -199,11 +199,26 @@ function carWithinBoundsRelative(relativeX, relativeZ) {
 
 function generateCar(scene, x, z, dir) {
   const car = new THREE.Group()
-  // const light = new THREE.PointLight(0xf72119)
-  // light.position.x = 0
-  // light.position.y = 0
-  // light.position.z = 0
-  // car.add(light)
+
+  const light = new THREE.SpotLight(0xff0000)
+  light.angle = Math.PI / 8
+  light.position.x = 0
+  light.position.y = 0
+  light.position.z = 0
+  // todo: implement shadows
+  // light.shadow.camera.left = 10
+  // light.shadow.camera.right = -10
+  // light.shadow.camera.top = 10
+  // light.shadow.camera.bottom = -10
+  // light.shadow.camera.near = -10
+  // light.shadow.camera.far = 1000
+  // light.shadow.bias = -0.0001
+  car.add(light)
+  // todo: figure out which way lights should go
+  light.target.position.x = -1
+  light.target.position.y = 0
+  light.target.position.z = 0
+  car.add(light.target)
 
   const body = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
@@ -303,8 +318,10 @@ export function updateEntities(scene) {
       scene.remove(obj.car)
       obj.car.children.forEach((child) => {
         scene.remove(child)
-        if (child.type === 'PointLight') {
+        console.log(child.type)
+        if (child.type === 'SpotLight') {
           child.dispose()
+        } else if (child.type === 'Object3D') {
         } else {
           child.geometry.dispose()
           child.material.dispose()
