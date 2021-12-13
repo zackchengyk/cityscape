@@ -33,7 +33,16 @@ export function setupLighting(scene, renderer) {
 
   //   plane that receives shadows (but does not cast them)
   const planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1)
-  const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x2773cc })
+  const planeMaterial = new THREE.MeshStandardMaterial({
+    color: 0x2773cc,
+    stencilWrite: true,
+    stencilFunc: THREE.AlwaysStencilFunc,
+    stencilRef: 0,
+    stencilFuncMask: 0xff,
+    stencilFail: THREE.KeepStencilOp,
+    stencilZFail: THREE.KeepStencilOp,
+    stencilZPass: THREE.ReplaceStencilOp,
+  })
   planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
   planeMesh.rotation.x = -Math.PI / 2
   planeMesh.receiveShadow = true

@@ -16,9 +16,7 @@ export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2 
 }
 
 export function updateBox({ worldX, worldZ, actualHeight, boxMesh }, scale) {
-  const height = actualHeight * scale
-  boxMesh.scale.y = height
-  boxMesh.position.set(worldX - focus.x, height / 2, worldZ - focus.z)
+  boxMesh.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
 }
 
 export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale) {
@@ -36,18 +34,18 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     stencilFunc: THREE.AlwaysStencilFunc,
     stencilRef: 1,
     stencilFuncMask: 0xff,
-    stencilFail: THREE.ReplaceStencilOp,
+    stencilFail: THREE.KeepStencilOp,
     stencilZFail: THREE.KeepStencilOp,
     stencilZPass: THREE.ReplaceStencilOp,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
-  boxMesh.scale.set(0.8, height, 0.8)
-  boxMesh.position.set(worldX - focus.x, height / 2, worldZ - focus.z)
+  boxMesh.scale.set(0.8, actualHeight, 0.8)
+  boxMesh.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
   // Shadow stuff
   boxMesh.castShadow = true
   boxMesh.receiveShadow = true
   // Outline stuff
-  const [outlineMesh1, outlineMesh2] = generateOutlineMesh(boxMesh)
+  const [outlineMesh1, outlineMesh2] = generateOutlineMesh(boxMesh, actualHeight)
   // Add to map and scene
   addToGridCellMap({
     type: 'box',

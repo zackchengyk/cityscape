@@ -140,7 +140,7 @@ function withinBounds(worldX, worldZ) {
   const relativeZ = worldZ - focus.z
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
   const result =
-    THREE.MathUtils.smoothstep(BLOB_RADIUS_SQUARED - distanceSquared, 0, BLOB_RADIUS_SQUARED) - 0.05
+    THREE.MathUtils.smoothstep(BLOB_RADIUS_SQUARED - distanceSquared, 0, BLOB_RADIUS_SQUARED) - 0.01
   return result
 }
 
