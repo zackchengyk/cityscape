@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import { OrthographicCamera } from 'three'
+import { BLOB_RADIUS } from '/js/grid.js'
 
 let ambientLight, dirLight, planeMesh, currTime
 
@@ -12,12 +14,10 @@ export function setupLighting(scene, renderer) {
   dirLight = new THREE.DirectionalLight(0xffffff, 0.5) // todo: factor out
   dirLight.position.set(-1, 1, -1) // related todo: movement
   dirLight.castShadow = true
-  dirLight.shadow.camera.left = 10
-  dirLight.shadow.camera.right = -10
-  dirLight.shadow.camera.top = 10
-  dirLight.shadow.camera.bottom = -10
-  dirLight.shadow.camera.near = -10
-  dirLight.shadow.camera.far = 1000
+  const x = BLOB_RADIUS * 1.5
+  dirLight.shadow.camera = new OrthographicCamera(-x, x, x, -x, -10, 10)
+  dirLight.shadow.mapSize.height = x * 200
+  dirLight.shadow.mapSize.width = x * 200
   dirLight.shadow.bias = -0.0001
   scene.add(dirLight)
   renderer.shadowMap.enabled = true

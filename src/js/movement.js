@@ -13,6 +13,7 @@ export const movementProperties = {
 }
 // Fix me maybe?: this is a non-defensive-copying accessor, for speed
 export const focus = movementProperties._worldPosition
+export const getSpeed = () => movementProperties._velocity.length()
 
 // Keybindings
 const keybindings = {

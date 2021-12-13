@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { clearBox, updateBox, fillWithBox } from '/js/box'
 import { genStreets } from '/js/config'
-import { focus } from '/js/movement'
+import { focus, getSpeed } from '/js/movement'
 
 // Important
 const gridCellMap = new Map()
@@ -14,7 +14,6 @@ export function setupGrid(scene) {
 // Animate function
 const BOUND_X = 10 // FIXME: should be correct and dependent on camera's zoom
 const BOUND_Z = 10 // FIXME: should be correct and dependent on camera's zoom
-const DEBOUNCE_POSITION_THRESHOLD = 0.01
 let prevFocusX = Infinity
 let prevFocusZ = Infinity
 export function updateGrid(scene) {
@@ -24,10 +23,8 @@ export function updateGrid(scene) {
   const { x: focusX, z: focusZ } = focus
 
   // Debounce recalculation things
-  if (
-    Math.abs(focusX - prevFocusX) < DEBOUNCE_POSITION_THRESHOLD &&
-    Math.abs(focusZ - prevFocusZ) < DEBOUNCE_POSITION_THRESHOLD
-  ) {
+  const updateThreshold = Math.max(getSpeed() * 0.5, 0.002)
+  if (Math.abs(focusX - prevFocusX) < updateThreshold && Math.abs(focusZ - prevFocusZ) < updateThreshold) {
     return
   }
   prevFocusX = focusX
@@ -133,7 +130,7 @@ function xzToKey(x, z) {
 }
 
 // FIXME: rename this function
-const BLOB_RADIUS = 5
+export const BLOB_RADIUS = 4
 const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
 function withinBounds(worldX, worldZ) {
   const relativeX = worldX - focus.x
