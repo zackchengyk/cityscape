@@ -23,16 +23,36 @@ const vertexShader = `
   }
 `
 const fragmentShader = `
+  uniform int renderType;
   uniform sampler2D boxesTexture;
   uniform sampler2D bloomTexture;
   varying vec2 vUv;
   void main() {
     vec4 boxesColor = texture2D( boxesTexture, vUv );
-    if (boxesColor.x < 0.005 && boxesColor.y < 0.005 && boxesColor.z < 0.005) {
-      gl_FragColor = boxesColor + 0.2 * texture2D( bloomTexture, vUv );
-    } else {
-      gl_FragColor = boxesColor + texture2D( bloomTexture, vUv );
+    vec4 bloomColor = texture2D( bloomTexture, vUv );
+
+    switch (renderType) {
+      // Bloom + scene
+      case 0: {
+        if (boxesColor.x < 0.005 && boxesColor.y < 0.005 && boxesColor.z < 0.005) {
+          gl_FragColor = boxesColor + 0.2 * bloomColor;
+        } else {
+          gl_FragColor = boxesColor + bloomColor;
+        }
+        return;
+      }
+      // Bloom only
+      case 1: {
+        gl_FragColor = bloomColor;
+        return;
+      }
+      // No bloom (scene only)
+      case 2: {
+        gl_FragColor = boxesColor;
+        return;
+      }
     }
+    
   }
 `
 
@@ -110,6 +130,7 @@ function setupCameraSceneRendererComposer(cityscape) {
   const shaderPass = new ShaderPass(
     new THREE.ShaderMaterial({
       uniforms: {
+        renderType: { value: 0 },
         boxesTexture: { value: null },
         bloomTexture: { value: cityscape.bloomComposer.renderTarget2.texture },
       },
