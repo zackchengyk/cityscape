@@ -73,7 +73,7 @@ export function updateRain(cityscape) {
   }
   rain.geometry.attributes.position.needsUpdate = true
   if (cityscape.params.rain == false && visibleRain == false) {
-    scene.remove(rain)
+    cityscape.scene.remove(rain)
     rain.geometry.dispose()
     rain.material.dispose()
     rain = null
