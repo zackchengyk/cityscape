@@ -63,8 +63,8 @@ function renderBloomToTexture(cityscape) {
 // Resize helper
 function updateSize(cityscape) {
   const canvas = cityscape.renderer.domElement
-  const w = window.innerWidth
-  const h = window.innerHeight
+  const w = cityscape.container.clientWidth
+  const h = cityscape.container.clientHeight
   const needResize = canvas.width !== w || canvas.height !== h
   if (needResize) {
     cityscape.screenResolution.set(h, w)

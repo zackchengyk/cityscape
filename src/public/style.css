@@ -6,7 +6,24 @@ body {
   width: 100vw;
 }
 
-canvas {
+body {
   position: fixed;
   inset: 0;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  background-color: #0a0b0e;
+}
+
+#container {
+  position: relative;
+  padding-top: 48%; /* 4:3 aspect */
+  width: 64%;
+}
+
+#cityscape {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 10px;
 }

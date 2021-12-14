@@ -60,14 +60,14 @@ export function setup(cityscape) {
 // Setup helper
 function setupCameraSceneRendererComposer(cityscape) {
   // Dimensions
-  const screenX = window.innerWidth
-  const screenY = window.innerHeight
+  const screenX = cityscape.container.clientWidth
+  const screenY = cityscape.container.clientHeight
   cityscape.screenResolution = new THREE.Vector2(screenX, screenY)
   const aspectRatio = screenX / screenY
 
   // Camera
   cityscape.camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, -20, 20)
-  cityscape.camera.zoom = 0.15 // todo GUI?: make into GUI-changeable value, with some default and some range, in a file with all the others
+  cityscape.camera.zoom = 0.2 // todo GUI?: make into GUI-changeable value, with some default and some range, in a file with all the others
   cityscape.camera.position.set(1, 1, 1)
   cityscape.camera.lookAt(0, 0, 0)
   cityscape.camera.updateProjectionMatrix()
@@ -76,7 +76,7 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.scene = new THREE.Scene()
 
   // Renderer
-  cityscape.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('cityscape') })
+  cityscape.renderer = new THREE.WebGLRenderer({ canvas: cityscape.canvas })
   cityscape.renderer.setPixelRatio(window.devicePixelRatio) // todo GUI?
   cityscape.renderer.setClearColor(0x1e1a2b) // todo GUI?: make into GUI-changeable value, with some default, in a file with all the others
   cityscape.renderer.setSize(screenX, screenY)
