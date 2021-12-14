@@ -43,11 +43,11 @@ export function setup(cityscape) {
   cityscape.stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
   document.body.appendChild(cityscape.stats.dom)
 
+  // Setup GUI and parameters
+  setupGUI(cityscape)
+
   // Setup basic stuff
   setupCameraSceneRendererComposer(cityscape)
-
-  // Setup GUI
-  setupGUI(cityscape)
 
   // Setup gamepad and listeners
   setupMovement(cityscape)
@@ -83,6 +83,8 @@ function setupCameraSceneRendererComposer(cityscape) {
 
   // Renderer
   cityscape.renderer = new THREE.WebGLRenderer({ canvas: cityscape.canvas })
+  cityscape.renderer.toneMapping = THREE.ReinhardToneMapping
+  cityscape.renderer.toneMappingExposure = Math.pow(cityscape.params.exposure, 4.0)
   cityscape.renderer.setPixelRatio(window.devicePixelRatio) // todo GUI?
   cityscape.renderer.setClearColor(0x1e1a2b) // todo GUI?: make into GUI-changeable value, with some default, in a file with all the others
   cityscape.renderer.setSize(screenX, screenY)
@@ -91,7 +93,12 @@ function setupCameraSceneRendererComposer(cityscape) {
   const renderPass = new RenderPass(cityscape.scene, cityscape.camera)
 
   // B. Bloom pass
-  const unrealBloomPass = new UnrealBloomPass(cityscape.screenResolution, 1, 0, 0)
+  const unrealBloomPass = new UnrealBloomPass(
+    cityscape.screenResolution,
+    cityscape.params.bloomStrength,
+    cityscape.params.bloomRadius,
+    cityscape.params.bloomThreshold
+  )
 
   // Bloom composer (A + B)
   cityscape.bloomComposer = new EffectComposer(cityscape.renderer)
