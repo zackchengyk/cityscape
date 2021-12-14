@@ -29,12 +29,15 @@ const keybindings = {
 const gamepad = {}
 
 // Setup function: Set up gamepad and listeners for gamepad
-export function setupGamepadAndListeners() {
+export function setupMovement(_) {
+  // Event handler function to set the gamepad's key to a certain value
   function toggleGamepadValue(event, key, value) {
     if (event.key === key) {
       gamepad[key] = value
     }
   }
+
+  // Add field to gamepad object, and add listeners
   for (const key in keybindings) {
     gamepad[key] = false
     window.addEventListener('keydown', (event) => toggleGamepadValue(event, key, true))
@@ -43,7 +46,7 @@ export function setupGamepadAndListeners() {
 }
 
 // Animate function: Update velocity and position
-export function updateMovement(deltaTime) {
+export function updateMovement(cityscape, deltaTime) {
   // Get current velocity
   const currVel = movementProperties._velocity
   const currVelNormalized = currVel.clone().normalize()

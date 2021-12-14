@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { setupGrid } from '/js/grid'
 import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
-import { setupGamepadAndListeners } from '/js/movement'
+import { setupMovement } from '/js/movement'
 
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -47,14 +47,14 @@ export function setup(cityscape) {
   // Setup GUI
   setupGUI(cityscape)
 
-  // Setup listeners
-  setupGamepadAndListeners()
+  // Setup gamepad and listeners
+  setupMovement(cityscape)
 
   // Setup geometry
-  setupGrid(cityscape.scene, cityscape.camera)
+  setupGrid(cityscape)
 
   // Setup lights
-  setupLighting(cityscape.scene, cityscape.renderer)
+  setupLighting(cityscape)
 }
 
 // Setup helper

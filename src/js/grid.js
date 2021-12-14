@@ -28,15 +28,15 @@ export function unDarkenNonGlowingGridCells() {
   })
 }
 
-// Init function
-export function setupGrid(scene) {
-  updateGrid(scene)
+// Setup function
+export function setupGrid(cityscape) {
+  updateGrid(cityscape)
 }
 
 // Animate function
 let prevFocusX = Infinity
 let prevFocusZ = Infinity
-export function updateGrid(scene) {
+export function updateGrid(cityscape) {
   // Note: this ASSUMES that all visible grid cells are within [-boundX, boundX], [-boundZ, boundZ]
 
   // Get position
@@ -71,11 +71,11 @@ export function updateGrid(scene) {
           updateGridCell(gridCellMap.get(gridCellKey), scale)
         } else {
           // Fill currently empty grid cell
-          fillGridCell(scene, worldX, worldZ, scale, gridCellKey)
+          fillGridCell(cityscape.scene, worldX, worldZ, scale, gridCellKey)
         }
       } else if (gridCellMap.has(gridCellKey)) {
         // Clear currently occupied grid cell
-        clearGridCell(scene, gridCellMap.get(gridCellKey))
+        clearGridCell(cityscape.scene, gridCellMap.get(gridCellKey))
         kvPairsToDelete.push(gridCellKey)
       }
     }

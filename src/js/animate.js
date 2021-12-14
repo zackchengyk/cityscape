@@ -16,34 +16,30 @@ export function animate(cityscape, currTime) {
   prevTime = currTime
 
   updateSize(cityscape)
-  updateMovement(deltaTime)
-  updateGrid(cityscape.scene)
+  updateMovement(cityscape, deltaTime)
+  updateGrid(cityscape)
   updateEntities(cityscape.scene)
-  updateLighting(cityscape.scene, cityscape.params)
-
-  // Render
-  cityscape.renderer.clear()
+  updateLighting(cityscape)
 
   // Render bloom to texture
+  cityscape.renderer.clear()
   renderBloomToTexture(cityscape)
 
   // Render (+ outlines) to screen
-  cityscape.camera.layers.set(1)
-  cityscape.shaderComposer.render()
-  cityscape.camera.layers.set(0)
+  renderToScreen(cityscape)
 
   cityscape.stats.end()
 }
 
 // Animate helper
 function renderBloomToTexture(cityscape) {
+  // Go to 'everything' layer
+  cityscape.camera.layers.set(0)
+
   // Temporarily swap out clear color
   let tempRendererClearColor = new THREE.Color()
   cityscape.renderer.getClearColor(tempRendererClearColor)
   cityscape.renderer.setClearColor('black') // Do not interfere with bloom
-
-  // Go to 'everything' layer
-  cityscape.camera.layers.set(0)
 
   // Temporarily swap out non-glowing objects' materials
   darkenPlane(darkMaterial)
@@ -58,6 +54,15 @@ function renderBloomToTexture(cityscape) {
 
   // Revert clear color
   cityscape.renderer.setClearColor(tempRendererClearColor)
+}
+
+// Animate helper
+function renderToScreen(cityscape) {
+  // Go to layer with outline-boxes
+  cityscape.camera.layers.set(1)
+
+  // Render
+  cityscape.shaderComposer.render()
 }
 
 // Resize helper

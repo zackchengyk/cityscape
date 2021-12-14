@@ -6,27 +6,29 @@ let ambientLight, dirLight, currTime
 let planeMesh, planeMaterial
 
 // Init function
-export function setupLighting(scene, renderer) {
+export function setupLighting(cityscape) {
   // Ambient light
   ambientLight = new THREE.AmbientLight(0xffffff, 0.25) // todo: factor out
-  scene.add(ambientLight)
   ambientLight.layers.enable(0)
   ambientLight.layers.enable(1)
+  cityscape.scene.add(ambientLight)
 
-  // Directional light and shadows
+  // Directional light
   dirLight = new THREE.DirectionalLight(0xffffff, 0.15) // todo: factor out
   dirLight.position.set(-1, 1, -1) // related todo: movement
-  dirLight.castShadow = true
-  const x = BLOB_RADIUS * 1.5
-  dirLight.shadow.camera = new OrthographicCamera(-x, x, x, -x, -10, 10)
-  dirLight.shadow.mapSize.height = x * 200
-  dirLight.shadow.mapSize.width = x * 200
-  dirLight.shadow.bias = -0.0001
-  scene.add(dirLight)
-  renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap
   dirLight.layers.enable(0)
   dirLight.layers.enable(1)
+  cityscape.scene.add(dirLight)
+
+  // Directional light's shadows
+  dirLight.castShadow = true
+  const r = BLOB_RADIUS * 1.5
+  dirLight.shadow.camera = new OrthographicCamera(-r, r, r, -r, -10, 10)
+  dirLight.shadow.mapSize.height = r * 200
+  dirLight.shadow.mapSize.width = r * 200
+  dirLight.shadow.bias = -0.0001
+  cityscape.renderer.shadowMap.enabled = true
+  cityscape.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
   // Plane
   const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
@@ -37,27 +39,26 @@ export function setupLighting(scene, renderer) {
   planeMesh.layers.enable(0)
   planeMesh.layers.enable(1)
   planeMesh.renderOrder = -999
-  scene.add(planeMesh)
+  cityscape.scene.add(planeMesh)
 }
 
 // Animate function
-export function updateLighting(scene, params) {
-  // Todo: animate lighting, maybe move plane as well?
-  if (dirLight.castShadow !== params.shadows) {
-    dirLight.castShadow = params.shadows
-  }
-  if (currTime !== params.timeOfDay) {
-    currTime = params.timeOfDay
-    const time = (params.timeOfDay / 24) * (Math.PI / 2)
-    var nsin = Math.sin(time)
-    var ncos = Math.cos(time)
-    console.log(time, nsin, ncos)
-    dirLight.position.set(-ncos * Math.sqrt(2), 1, -nsin * Math.sqrt(2))
+export function updateLighting(cityscape) {
+  // Update based on shadow parameter
+  dirLight.castShadow = cityscape.params.shadows
+  // Update based on time parameter
+  if (currTime !== cityscape.params.timeOfDay) {
+    currTime = cityscape.params.timeOfDay
+    const time = (cityscape.params.timeOfDay / 24) * (Math.PI / 2)
+    const sint = Math.sin(time)
+    const cost = Math.cos(time)
+    console.log(time, sint, cost)
+    dirLight.position.set(-cost * Math.sqrt(2), 1, -sint * Math.sqrt(2))
     if (currTime < 6 || currTime > 20) {
       // after 8pm, before 6am
-      dirLight.intensity = 0.05
+      dirLight.intensity = 0.15
     } else {
-      dirLight.intensity = nsin * 0.15
+      dirLight.intensity = sint * 0.25
     }
   }
 }
