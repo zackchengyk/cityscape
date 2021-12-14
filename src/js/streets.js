@@ -4,10 +4,11 @@ import { genStreets, BLOB_RADIUS } from '/js/config'
 
 const BOUND_X = BLOB_RADIUS
 const BOUND_Z = BLOB_RADIUS
+const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
 
 // Car stuff
 
-const carProbability = 0
+const carProbability = 0.15
 const Cars = new Set()
 
 const carVel = [
@@ -21,10 +22,10 @@ const carRot = [Math.PI / 2, -Math.PI / 2, Math.PI, 0]
 
 // Drive on the right side of the road
 const carDisplacement = [
-  [-0.45, 0],
-  [0.45, 0],
-  [0, 0.45],
-  [0, -0.45],
+  [-0.40, 0],
+  [0.40, 0],
+  [0, 0.40],
+  [0, -0.40],
 ]
 function carWithinBoundsRelative(relativeX, relativeZ) {
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
@@ -187,7 +188,12 @@ function hasNearbyStreet(v, dir) {
   return false
 }
 
-export function generateStreets(centerX, centerZ) {
+export function generateStreets(cityscape) {
+  if (!genStreets) return
+  const { x: focusX, z: focusZ } = focus
+  const centerX = Math.round(focusX)
+  const centerZ = Math.round(focusZ)
+
   for (let boxX = centerX - BOUND_X; boxX < XstreetsLimits.low; boxX++) {
     if (hasNearbyStreet(boxX, 0)) continue
     if (Math.random() < streetProbability) {
@@ -195,7 +201,7 @@ export function generateStreets(centerX, centerZ) {
     }
   }
   XstreetsLimits.low = Math.min(XstreetsLimits.low, centerX - BOUND_X)
-  for (let boxX = XstreetsLimits.high; boxX < centerX + BOUND_X; boxX++) {
+  for (let boxX = XstreetsLimits.high + 1; boxX <= centerX + BOUND_X; boxX++) {
     if (hasNearbyStreet(boxX, 0)) continue
     if (Math.random() < streetProbability) {
       Xstreets.add(boxX)
@@ -209,7 +215,7 @@ export function generateStreets(centerX, centerZ) {
     }
   }
   ZstreetsLimits.low = Math.min(ZstreetsLimits.low, centerZ - BOUND_Z)
-  for (let boxZ = ZstreetsLimits.high; boxZ < centerZ + BOUND_Z; boxZ++) {
+  for (let boxZ = ZstreetsLimits.high + 1; boxZ <= centerZ + BOUND_Z; boxZ++) {
     if (hasNearbyStreet(boxZ, 1)) continue
     if (Math.random() < streetProbability) {
       Zstreets.add(boxZ)
@@ -220,14 +226,4 @@ export function generateStreets(centerX, centerZ) {
 
 export function isStreetPosition(x, z) {
   return Xstreets.has(x) || Zstreets.has(z)
-}
-
-export function setupStreets(cityscape) {
-  const { x: focusX, z: focusZ } = focus
-  const roundedFocusX = Math.round(focusX)
-  const roundedFocusZ = Math.round(focusZ)
-
-  if (genStreets) {
-    generateStreets(roundedFocusX, roundedFocusZ)
-  }
 }
