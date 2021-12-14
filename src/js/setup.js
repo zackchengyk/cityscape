@@ -1,11 +1,11 @@
 import * as THREE from 'three'
 import { setupGrid } from '/js/grid'
+import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
 import { setupGamepadAndListeners } from '/js/movement'
 
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -45,11 +45,7 @@ export function setup(cityscape) {
   setupCameraSceneRendererComposer(cityscape)
 
   // Setup GUI
-  cityscape.params = { shadows: true, timeOfDay: 12 }
-  const gui = new GUI()
-  gui.add(cityscape.params, 'timeOfDay', 0, 24)
-  gui.add(cityscape.params, 'shadows')
-  gui.open()
+  setupGUI(cityscape)
 
   // Setup listeners
   setupGamepadAndListeners()
