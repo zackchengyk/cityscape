@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { camOffsetX, camOffsetY, camOffsetZ } from '/js/config'
 import { setupGrid } from '/js/grid'
 import { setupLighting } from '/js/lighting'
 import { setupGamepadAndListeners } from '/js/movement'
@@ -43,8 +42,7 @@ export function setup(cityscape) {
   document.body.appendChild(cityscape.stats.dom)
 
   // Setup basic stuff
-  cityscape.screenResolution = new THREE.Vector2(window.innerWidth, window.innerHeight)
-  setupCameraSceneRenderer(cityscape)
+  setupCameraSceneRendererComposer(cityscape)
 
   // Setup GUI
   cityscape.params = { shadows: true, timeOfDay: 12 }
@@ -64,15 +62,17 @@ export function setup(cityscape) {
 }
 
 // Setup helper
-function setupCameraSceneRenderer(cityscape) {
+function setupCameraSceneRendererComposer(cityscape) {
   // Dimensions
-  const { x: screenX, y: screenY } = cityscape.screenResolution
+  const screenX = window.innerWidth
+  const screenY = window.innerHeight
+  cityscape.screenResolution = new THREE.Vector2(screenX, screenY)
   const aspectRatio = screenX / screenY
 
   // Camera
   cityscape.camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, -20, 20)
-  cityscape.camera.zoom = 0.15
-  cityscape.camera.position.set(camOffsetX, camOffsetY, camOffsetZ)
+  cityscape.camera.zoom = 0.15 // todo GUI?: make into GUI-changeable value, with some default and some range, in a file with all the others
+  cityscape.camera.position.set(1, 1, 1)
   cityscape.camera.lookAt(0, 0, 0)
   cityscape.camera.updateProjectionMatrix()
 
@@ -81,9 +81,8 @@ function setupCameraSceneRenderer(cityscape) {
 
   // Renderer
   cityscape.renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('cityscape') })
-  cityscape.renderer.setPixelRatio(window.devicePixelRatio)
-  cityscape.renderer.autoClear = false
-  cityscape.renderer.setClearColor(0x1e1a2b)
+  cityscape.renderer.setPixelRatio(window.devicePixelRatio) // todo GUI?
+  cityscape.renderer.setClearColor(0x1e1a2b) // todo GUI?: make into GUI-changeable value, with some default, in a file with all the others
   cityscape.renderer.setSize(screenX, screenY)
 
   // A. Render pass
@@ -94,7 +93,7 @@ function setupCameraSceneRenderer(cityscape) {
 
   // Bloom composer (A + B)
   cityscape.bloomComposer = new EffectComposer(cityscape.renderer)
-  cityscape.bloomComposer.renderToScreen = false // Will render to cityscape.bloomComposer.renderTarget2.texture
+  cityscape.bloomComposer.renderToScreen = false // will render to cityscape.bloomComposer.renderTarget2.texture
   cityscape.bloomComposer.addPass(renderPass)
   cityscape.bloomComposer.addPass(unrealBloomPass)
 
@@ -108,9 +107,9 @@ function setupCameraSceneRenderer(cityscape) {
       vertexShader,
       fragmentShader,
     }),
-    'boxesTexture'
+    'boxesTexture' // texture from its own earlier passes
   )
-  shaderPass.needsSwap = true
+
   // Shader composer (A + C, dependent on A + B)
   cityscape.shaderComposer = new EffectComposer(cityscape.renderer)
   cityscape.shaderComposer.addPass(renderPass)
