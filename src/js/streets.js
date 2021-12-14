@@ -94,6 +94,12 @@ function generateCar(scene, x, z, dir) {
   car.position.x += x + carDisplacement[dir][0] * Math.random() - focus.x
   car.position.z += z + carDisplacement[dir][1] * Math.random() - focus.z
   car.rotateY(carRot[dir])
+  car.layers.enable(0)
+  car.layers.enable(1)
+  car.traverse((child) => {
+    child.layers.enable(0)
+    child.layers.enable(1)
+  })
   scene.add(car)
   let worldPos = car.position.clone()
   worldPos.x += focus.x
