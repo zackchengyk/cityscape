@@ -3,15 +3,13 @@ import * as THREE from 'three'
 const zeroVec3 = () => new THREE.Vector3(0, 0, 0)
 
 // Movement Properties
-// Fix me maybe?: this is dangerously accessed by many files and functions!
-export const movementProperties = {
+const movementProperties = {
   _velocity: zeroVec3(),
   _worldPosition: zeroVec3(),
   _maxSpeed: 0.075,
   _accLam: 0.0025,
   _toZeroAccLamModifier: 1.25,
 }
-// Fix me maybe?: this is a non-defensive-copying accessor, for speed
 export const focus = movementProperties._worldPosition
 export const getSpeed = () => movementProperties._velocity.length()
 
@@ -30,7 +28,7 @@ const keybindings = {
 // Gamepad: map from key to boolean ('is pressed')
 const gamepad = {}
 
-// Init function: Set up gamepad and listeners for gamepad
+// Setup function: Set up gamepad and listeners for gamepad
 export function setupGamepadAndListeners() {
   function toggleGamepadValue(event, key, value) {
     if (event.key === key) {
@@ -43,6 +41,7 @@ export function setupGamepadAndListeners() {
     window.addEventListener('keyup', (event) => toggleGamepadValue(event, key, false))
   }
 }
+
 // Animate function: Update velocity and position
 export function updateMovement(deltaTime) {
   // Get current velocity
