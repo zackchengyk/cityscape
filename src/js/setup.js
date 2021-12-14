@@ -71,7 +71,7 @@ function setupCameraSceneRenderer(cityscape) {
 
   // Camera
   cityscape.camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, -20, 20)
-  cityscape.camera.zoom = 0.2
+  cityscape.camera.zoom = 0.15
   cityscape.camera.position.set(camOffsetX, camOffsetY, camOffsetZ)
   cityscape.camera.lookAt(0, 0, 0)
   cityscape.camera.updateProjectionMatrix()
@@ -90,7 +90,7 @@ function setupCameraSceneRenderer(cityscape) {
   const renderPass = new RenderPass(cityscape.scene, cityscape.camera)
 
   // B. Bloom pass
-  const unrealBloomPass = new UnrealBloomPass(cityscape.screenResolution, 2, 0.5, 0.0)
+  const unrealBloomPass = new UnrealBloomPass(cityscape.screenResolution, 1, 0, 0)
 
   // Bloom composer (A + B)
   cityscape.bloomComposer = new EffectComposer(cityscape.renderer)

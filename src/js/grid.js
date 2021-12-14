@@ -5,6 +5,10 @@ import { focus, getSpeed } from '/js/movement'
 
 // Important
 const gridCellMap = new Map()
+export const BLOB_RADIUS = 4
+const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
+const BOUND_X = BLOB_RADIUS
+const BOUND_Z = BLOB_RADIUS
 
 // TODO: REFACTOR
 export function darkenNonGlowingGridCells(darkMaterial) {
@@ -30,8 +34,6 @@ export function setupGrid(scene) {
 }
 
 // Animate function
-const BOUND_X = 10 // FIXME: should be correct and dependent on camera's zoom
-const BOUND_Z = 10 // FIXME: should be correct and dependent on camera's zoom
 let prevFocusX = Infinity
 let prevFocusZ = Infinity
 export function updateGrid(scene) {
@@ -148,8 +150,6 @@ function xzToKey(x, z) {
 }
 
 // FIXME: rename this function
-export const BLOB_RADIUS = 4
-const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
 function withinBounds(worldX, worldZ) {
   const relativeX = worldX - focus.x
   const relativeZ = worldZ - focus.z
