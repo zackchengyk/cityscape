@@ -15,6 +15,7 @@ export function animate(cityscape, currTime) {
   const deltaTime = currTime - prevTime
   prevTime = currTime
 
+  // Update things
   updateSize(cityscape)
   updateMovement(cityscape, deltaTime)
   updateGrid(cityscape)
@@ -22,7 +23,6 @@ export function animate(cityscape, currTime) {
   updateLighting(cityscape)
 
   // Render bloom to texture
-  cityscape.renderer.clear()
   renderBloomToTexture(cityscape)
 
   // Render (+ outlines) to screen
