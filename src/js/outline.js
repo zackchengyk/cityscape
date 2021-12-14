@@ -1,8 +1,5 @@
 import * as THREE from 'three'
 
-// Fixme?: Refactor
-export const outlineScene = new THREE.Scene()
-
 const OUTLINE_THICKNESS = 0.05
 
 const baseOutlineMaterial1 = new THREE.MeshBasicMaterial({
@@ -81,7 +78,5 @@ export function generateOutlineMesh(boxMesh, actualHeight) {
   const outlineMesh1 = new THREE.Mesh(outlineGeometry, outlineMaterial1)
   const outlineMesh2 = new THREE.Mesh(outlineGeometry, outlineMaterial2)
 
-  outlineScene.add(outlineMesh1)
-  outlineScene.add(outlineMesh2)
   return [outlineMesh1, outlineMesh2]
 }

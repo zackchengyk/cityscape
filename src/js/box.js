@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { outlineScene } from './outline'
 import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
 import { focus } from '/js/movement'
 import { generateOutlineMesh } from '/js/outline'
@@ -8,8 +7,8 @@ export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2 
   removeFromScene(boxMesh)
   boxMesh.geometry.dispose()
   boxMesh.material.dispose()
-  outlineScene.remove(outlineMesh1)
-  outlineScene.remove(outlineMesh2)
+  removeFromScene(outlineMesh1)
+  removeFromScene(outlineMesh2)
   outlineMesh1.geometry.dispose()
   outlineMesh1.material.dispose()
   outlineMesh2.material.dispose()
@@ -46,15 +45,23 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   boxMesh.receiveShadow = true
   // Outline stuff
   const [outlineMesh1, outlineMesh2] = generateOutlineMesh(boxMesh, actualHeight)
+  addToScene(outlineMesh1)
+  addToScene(outlineMesh2)
+  outlineMesh1.layers.set(1)
+  outlineMesh2.layers.set(1)
+  outlineMesh2.renderOrder = -998
   // Add to map and scene
   addToGridCellMap({
     type: 'box',
     worldX,
     worldZ,
+    isGlowing: Math.random() < 0.25,
     actualHeight,
     boxMesh,
     outlineMesh1,
     outlineMesh2,
   })
   addToScene(boxMesh)
+  boxMesh.layers.enable(0)
+  boxMesh.layers.enable(1)
 }

@@ -6,6 +6,24 @@ import { focus, getSpeed } from '/js/movement'
 // Important
 const gridCellMap = new Map()
 
+// TODO: REFACTOR
+export function darkenNonGlowingGridCells(darkMaterial) {
+  gridCellMap.forEach((v) => {
+    if (!v.isGlowing) {
+      v.storedMaterial = v.boxMesh.material
+      v.boxMesh.material = darkMaterial
+    }
+  })
+}
+export function unDarkenNonGlowingGridCells() {
+  gridCellMap.forEach((v, k) => {
+    if (!v.isGlowing) {
+      v.boxMesh.material = v.storedMaterial
+      v.storedMaterial = undefined
+    }
+  })
+}
+
 // Init function
 export function setupGrid(scene) {
   updateGrid(scene)
@@ -170,7 +188,7 @@ function withinBounds(worldX, worldZ) {
 //
 // Car stuff
 
-const carProbability = 0.07
+const carProbability = 0
 const Cars = new Set()
 
 const carVel = [

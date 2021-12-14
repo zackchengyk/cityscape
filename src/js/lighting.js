@@ -2,16 +2,19 @@ import * as THREE from 'three'
 import { OrthographicCamera } from 'three'
 import { BLOB_RADIUS } from '/js/grid.js'
 
-let ambientLight, dirLight, planeMesh, currTime
+let ambientLight, dirLight, currTime
+let planeMesh, planeMaterial
 
 // Init function
 export function setupLighting(scene, renderer) {
-  // Ambient
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.55) // todo: factor out
+  // Ambient light
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.25) // todo: factor out
   scene.add(ambientLight)
+  ambientLight.layers.enable(0)
+  ambientLight.layers.enable(1)
 
-  // Directional and shadows
-  dirLight = new THREE.DirectionalLight(0xffffff, 0.5) // todo: factor out
+  // Directional light and shadows
+  dirLight = new THREE.DirectionalLight(0xffffff, 0.15) // todo: factor out
   dirLight.position.set(-1, 1, -1) // related todo: movement
   dirLight.castShadow = true
   const x = BLOB_RADIUS * 1.5
@@ -22,33 +25,22 @@ export function setupLighting(scene, renderer) {
   scene.add(dirLight)
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  dirLight.layers.enable(0)
+  dirLight.layers.enable(1)
 
-  // // TODO: light doesn't seem to make sense? building reflections are too high
-  // const pointGeometry = new THREE.SphereGeometry(0.02)
-  // let pointLight = new THREE.PointLight(0xffffff, 1, 50, 2) // distance, decay
-  // pointLight.add(new THREE.Mesh(pointGeometry, new THREE.MeshBasicMaterial({ color: 0xff0040 })))
-  // pointLight.position.set(0.5, 0.1, 0.5)
-  // pointLight.castShadow = true
-  // scene.add(pointLight)
-
-  //   plane that receives shadows (but does not cast them)
-  const planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1)
-  const planeMaterial = new THREE.MeshStandardMaterial({
-    color: 0x2773cc,
-    stencilWrite: true,
-    stencilFunc: THREE.AlwaysStencilFunc,
-    stencilRef: 0,
-    stencilFuncMask: 0xff,
-    stencilFail: THREE.KeepStencilOp,
-    stencilZFail: THREE.KeepStencilOp,
-    stencilZPass: THREE.ReplaceStencilOp,
-  })
+  // Plane
+  const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
+  planeMaterial = new THREE.MeshBasicMaterial({ color: 0x1e1a2b })
   planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
   planeMesh.rotation.x = -Math.PI / 2
   planeMesh.receiveShadow = true
+  planeMesh.layers.enable(0)
+  planeMesh.layers.enable(1)
+  planeMesh.renderOrder = -999
   scene.add(planeMesh)
 }
 
+// Animate function
 export function updateLighting(scene, params) {
   // Todo: animate lighting, maybe move plane as well?
   if (dirLight.castShadow !== params.shadows) {
@@ -63,9 +55,17 @@ export function updateLighting(scene, params) {
     dirLight.position.set(-ncos * Math.sqrt(2), 1, -nsin * Math.sqrt(2))
     if (currTime < 6 || currTime > 20) {
       // after 8pm, before 6am
-      dirLight.intensity = 0
+      dirLight.intensity = 0.05
     } else {
-      dirLight.intensity = nsin
+      dirLight.intensity = nsin * 0.15
     }
   }
+}
+
+// Helper function
+export function darkenPlane(darkMaterial) {
+  planeMesh.material = darkMaterial
+}
+export function unDarkenPlane() {
+  planeMesh.material = planeMaterial
 }
