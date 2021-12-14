@@ -4,6 +4,7 @@ import { generateStreets } from '/js/streets'
 import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
 import { setupMovement } from '/js/movement'
+import { setupRain } from '/js/weather'
 
 import Stats from '/../node_modules/stats.js/src/Stats.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -57,6 +58,9 @@ export function setup(cityscape) {
 
   // Setup lights
   setupLighting(cityscape)
+
+  // Setup weather
+  setupRain(cityscape)
 }
 
 // Setup helper

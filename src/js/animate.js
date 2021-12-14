@@ -4,6 +4,7 @@ import { updateGrid, darkenNonGlowingGridCells, unDarkenNonGlowingGridCells } fr
 import { updateEntities, generateStreets } from '/js/streets'
 import { updateLighting, darkenPlane, unDarkenPlane } from '/js/lighting'
 import { updateMovement } from '/js/movement'
+import { updateRain } from '/js/weather'
 
 let prevTime = 0
 
@@ -23,6 +24,7 @@ export function animate(cityscape, currTime) {
   updateGrid(cityscape)
   updateEntities(cityscape.scene)
   updateLighting(cityscape)
+  updateRain(cityscape)
 
   // Render bloom to texture
   renderBloomToTexture(cityscape)

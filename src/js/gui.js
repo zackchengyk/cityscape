@@ -8,9 +8,10 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 //           called (e.g. blob radius decreases => clean up unnecessary grid cells)
 
 export function setupGUI(cityscape) {
-  cityscape.params = { shadows: true, timeOfDay: 12 }
+  cityscape.params = { shadows: true, timeOfDay: 12, rain: false }
   const gui = new GUI()
   gui.add(cityscape.params, 'timeOfDay', 0, 24)
   gui.add(cityscape.params, 'shadows')
+  gui.add(cityscape.params, 'rain')
   gui.open()
 }
