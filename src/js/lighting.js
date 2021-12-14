@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrthographicCamera } from 'three'
-import { BLOB_RADIUS } from '/js/grid.js'
+import { BLOB_RADIUS } from '/js/config'
 
 let ambientLight, dirLight, currTime
 let planeMesh, planeMaterial

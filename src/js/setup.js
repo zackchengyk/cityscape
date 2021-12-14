@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { setupGrid } from '/js/grid'
+import { setupStreets } from '/js/streets'
 import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
 import { setupMovement } from '/js/movement'
@@ -51,6 +52,7 @@ export function setup(cityscape) {
   setupMovement(cityscape)
 
   // Setup geometry
+  setupStreets(cityscape)
   setupGrid(cityscape)
 
   // Setup lights

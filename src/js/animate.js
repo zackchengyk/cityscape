@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { darkMaterial } from './config'
-import { updateGrid, updateEntities, darkenNonGlowingGridCells, unDarkenNonGlowingGridCells } from '/js/grid'
+import { updateGrid, darkenNonGlowingGridCells, unDarkenNonGlowingGridCells } from '/js/grid'
+import { updateEntities } from '/js/streets'
 import { updateLighting, darkenPlane, unDarkenPlane } from '/js/lighting'
 import { updateMovement } from '/js/movement'
 
