@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { darkMaterial } from './config'
+import { darkMaterial } from '/js/config'
 import { updateGrid, darkenNonGlowingGridCells, unDarkenNonGlowingGridCells } from '/js/grid'
 import { updateEntities } from '/js/streets'
 import { updateLighting, enableBloomModeLighting, disableBloomModeLighting } from '/js/lighting'
@@ -53,7 +53,7 @@ function renderBloomToTexture(cityscape) {
 
   // Temporarily swap out non-glowing objects' materials
   enableBloomModeLighting(cityscape)
-  darkenNonGlowingGridCells(darkMaterial)
+  darkenNonGlowingGridCells()
 
   // Render
   cityscape.bloomComposer.render()

@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { darkMaterial } from '/js/config'
 import { clearBox, updateBox, fillWithBox } from '/js/box'
 import { focus, getSpeed } from '/js/movement'
 import { generateStreets, isStreetPosition } from '/js/streets'
@@ -7,7 +8,7 @@ import { generateStreets, isStreetPosition } from '/js/streets'
 const gridCellMap = new Map()
 
 // TODO: REFACTOR
-export function darkenNonGlowingGridCells(darkMaterial) {
+export function darkenNonGlowingGridCells() {
   gridCellMap.forEach((v) => {
     if (!v.isGlowing) {
       v.storedMaterial = v.boxMesh.material
