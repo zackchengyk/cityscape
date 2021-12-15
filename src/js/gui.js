@@ -11,6 +11,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 export function setupGUI(cityscape) {
   // Start up
   const parameters = {
+    autorun: false,
     scene: 'Bloom + Scene',
     timeOfDay: 12,
     shadows: true,
@@ -18,19 +19,20 @@ export function setupGUI(cityscape) {
     blobRadius: 4,
     exposure: 1.125,
     // Lighting
-    ambientLightIntensity: 0.6,
+    ambientLightIntensity: 0.4,
     dirLightIntensity: 0.6,
     // Bloom
-    bloomStrength: 0.75,
+    bloomStrength: 1.5,
     bloomRadius: 0,
     bloomThreshold: 0,
-    bloomAmbientLightIntensity: 0.3,
-    bloomDirLightIntensity: 0,
+    bloomAmbientLightIntensity: 0.2,
+    bloomDirLightIntensity: 0.2,
   }
   const gui = new GUI()
   // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements
 
   // Unorganized parameters
+  gui.add(parameters, 'autorun')
   gui.add(parameters, 'scene', ['Bloom + Scene', 'Bloom only', 'Scene only']).onChange((v) => {
     const existingShaderMaterial = cityscape.shaderComposer.passes[1].material.clone()
     let newRenderType = 0

@@ -17,6 +17,12 @@ export function animate(cityscape, currTime) {
   const deltaTime = currTime - prevTime
   prevTime = currTime
 
+  // Increment time
+  if (cityscape.params.autorun) {
+    cityscape.params.timeOfDay += deltaTime / 250
+    cityscape.params.timeOfDay = cityscape.params.timeOfDay % 24
+  }
+
   // Update things
   updateSize(cityscape)
   cityscape.orbitControls.update()
