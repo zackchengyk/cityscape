@@ -19,6 +19,7 @@ export function animate(cityscape, currTime) {
 
   // Update things
   updateSize(cityscape)
+  cityscape.orbitControls.update()
   updateMovement(cityscape, deltaTime)
   updateGrid(cityscape)
   updateEntities(cityscape)

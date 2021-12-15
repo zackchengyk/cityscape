@@ -144,5 +144,7 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.shaderComposer.addPass(shaderPass)
 
   // Temporary below
-  const orbitControls = new OrbitControls(cityscape.camera, cityscape.renderer.domElement)
+  cityscape.orbitControls = new OrbitControls(cityscape.camera, cityscape.renderer.domElement)
+  cityscape.orbitControls.enableDamping = true
+  cityscape.orbitControls.dampingFactor = 0.1
 }

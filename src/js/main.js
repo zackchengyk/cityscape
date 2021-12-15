@@ -11,6 +11,7 @@ const cityscape = {
   renderer: undefined,
   bloomComposer: undefined,
   shaderComposer: undefined,
+  orbitControls: undefined,
   params: undefined,
   stats: undefined, // Temporary
 }
