@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { NEAR_PLANE, FAR_PLANE, MIN_ZOOM, MAX_ZOOM } from '/js/config'
 import { setupGrid } from '/js/grid'
 import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
@@ -90,8 +91,8 @@ function setupCameraSceneRendererComposer(cityscape) {
   const aspectRatio = screenX / screenY
 
   // Camera
-  cityscape.camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, -20, 20)
-  cityscape.camera.zoom = 0.2 // todo GUI?: make into GUI-changeable value, with some default and some range, in a file with all the others
+  cityscape.camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, NEAR_PLANE, FAR_PLANE)
+  cityscape.camera.zoom = cityscape.params.zoom
   cityscape.camera.position.set(1, 1, 1)
   cityscape.camera.lookAt(0, 0, 0)
   cityscape.camera.updateProjectionMatrix()
@@ -103,8 +104,8 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.renderer = new THREE.WebGLRenderer({ canvas: cityscape.canvas })
   cityscape.renderer.toneMapping = THREE.LinearToneMapping
   cityscape.renderer.toneMappingExposure = cityscape.params.exposure
-  cityscape.renderer.setPixelRatio(window.devicePixelRatio) // todo GUI?
-  cityscape.renderer.setClearColor(0x1e1a2b) // todo GUI?: make into GUI-changeable value, with some default, in a file with all the others
+  cityscape.renderer.setPixelRatio(window.devicePixelRatio)
+  cityscape.renderer.setClearColor(0x000000)
   cityscape.renderer.setSize(screenX, screenY)
 
   // A. Render pass
@@ -143,8 +144,13 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.shaderComposer.addPass(renderPass)
   cityscape.shaderComposer.addPass(shaderPass)
 
-  // Temporary below
+  // Orbit controls
   cityscape.orbitControls = new OrbitControls(cityscape.camera, cityscape.renderer.domElement)
+  cityscape.orbitControls.minZoom = MIN_ZOOM
+  cityscape.orbitControls.maxZoom = MAX_ZOOM
+  cityscape.orbitControls.addEventListener('change', () => {
+    cityscape.params.zoom = cityscape.camera.zoom
+  })
   cityscape.orbitControls.enableDamping = true
   cityscape.orbitControls.dampingFactor = 0.1
 }

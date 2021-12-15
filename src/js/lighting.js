@@ -1,11 +1,12 @@
 import * as THREE from 'three'
-import { darkMaterial } from './config'
+import { darkMaterial, NEAR_PLANE, FAR_PLANE } from './config'
 
-let ambientLight, dirLight, currTime
+let ambientLight, dirLight
 let planeMesh, planeMaterial
 
 // Init function
 export function setupLighting(cityscape) {
+  prevZoom = cityscape.params.zoom
   prevBlobRadius = cityscape.params.blobRadius
   prevTimeOfDay = cityscape.params.timeOfDay
 
@@ -24,7 +25,7 @@ export function setupLighting(cityscape) {
   // Directional light's shadows
   dirLight.castShadow = true
   const r = cityscape.params.blobRadius * 1.5
-  dirLight.shadow.camera = new THREE.OrthographicCamera(-r, r, r, -r, -10, 10)
+  dirLight.shadow.camera = new THREE.OrthographicCamera(-r, r, r, -r, NEAR_PLANE, FAR_PLANE)
   const dim = r * 100
   dirLight.shadow.mapSize = new THREE.Vector2(dim, dim)
   dirLight.shadow.bias = -0.0001
@@ -32,26 +33,39 @@ export function setupLighting(cityscape) {
   cityscape.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
   // Plane
-  const planeGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
+  const planeGeometry = new THREE.PlaneGeometry(1, 1, 1, 1)
   planeMaterial = new THREE.MeshLambertMaterial({
     color: 0x171324,
     emissive: 0x171324,
     emissiveIntensity: 0.5,
   })
   planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
+  const s = 5 / cityscape.params.zoom
+  planeMesh.scale.set(s, s, s)
   planeMesh.rotation.x = -Math.PI / 2
   planeMesh.receiveShadow = true
   planeMesh.layers.enable(0)
   planeMesh.layers.enable(1)
   planeMesh.renderOrder = -999
-  updateBasedOnTimeOfDay(cityscape)
+  updateBasedOnTimeOfDay(cityscape) // style: why is this here lmao
   cityscape.scene.add(planeMesh)
 }
 
 // Animate function
+let prevZoom = 0
 let prevBlobRadius = 0
 let prevTimeOfDay = 0
 export function updateLighting(cityscape) {
+  // Update based on zoom
+  if (cityscape.camera.zoom !== cityscape.params.zoom) {
+    cityscape.camera.zoom = cityscape.params.zoom
+  }
+  if (prevZoom !== cityscape.params.zoom) {
+    prevZoom = cityscape.params.zoom
+    const s = 5 / cityscape.params.zoom
+    planeMesh.scale.set(s, s, s)
+    planeMesh.updateMatrix()
+  }
   // Update based on blobRadius parameter
   if (prevBlobRadius !== cityscape.params.blobRadius) {
     prevBlobRadius = cityscape.params.blobRadius

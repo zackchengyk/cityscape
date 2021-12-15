@@ -1,5 +1,6 @@
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
+import { MIN_ZOOM, MAX_ZOOM } from '/js/config'
 
 // Todo, @Jessie?
 // easy:   add more "simple" params, whose values are simply read by other things
@@ -17,7 +18,9 @@ export function setupGUI(cityscape) {
     shadows: true,
     rain: false,
     blobRadius: 4,
+    // Camera / Renderer
     exposure: 1.02,
+    zoom: 0.25,
     // Lighting
     ambientLightIntensity: 0.4,
     dirLightIntensity: 0.6,
@@ -60,17 +63,21 @@ export function setupGUI(cityscape) {
   gui.add(parameters, 'timeOfDay', 0, 24)
   gui.add(parameters, 'shadows')
   gui.add(parameters, 'rain')
-  gui.add(parameters, 'exposure', 0, 2).onChange((v) => {
+
+  // Camera / renderer parameters
+  const cameraParametersFolder = gui.addFolder('Camera / Renderer')
+  cameraParametersFolder.add(parameters, 'exposure', 0, 2).onChange((v) => {
     cityscape.renderer.toneMappingExposure = v
   })
+  cameraParametersFolder.add(parameters, 'zoom', MIN_ZOOM, MAX_ZOOM)
 
   // Lighting parameters
-  const lightParametersFolder = gui.addFolder('Light Parameters')
+  const lightParametersFolder = gui.addFolder('Lighting')
   lightParametersFolder.add(parameters, 'ambientLightIntensity', 0, 2)
   lightParametersFolder.add(parameters, 'dirLightIntensity', 0, 2)
 
   // Bloom parameters
-  const bloomParametersFolder = gui.addFolder('Bloom Parameters')
+  const bloomParametersFolder = gui.addFolder('Bloom')
   bloomParametersFolder.add(parameters, 'bloomStrength', 0, 3).onChange((v) => {
     cityscape.bloomComposer.passes[1].strength = v
   })
