@@ -3,7 +3,7 @@ import { getNoise, getPrimaryAndSecondaryColorModified, HEIGHT_SEED } from '/js/
 import { focus } from '/js/movement'
 import { generateOutlineMesh } from '/js/outline'
 
-export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2 }) {
+export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2, windows }) {
   removeFromScene(boxMesh)
   boxMesh.geometry.dispose()
   boxMesh.material.dispose()
@@ -12,10 +12,19 @@ export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2 
   outlineMesh1.geometry.dispose()
   outlineMesh1.material.dispose()
   outlineMesh2.material.dispose()
+  for (let { windowMesh } of windows) {
+      removeFromScene(windowMesh)
+      windowMesh.geometry.dispose()
+      windowMesh.material.dispose()
+  }
 }
 
-export function updateBox({ worldX, worldZ, actualHeight, boxMesh }, scale) {
+export function updateBox({ worldX, worldZ, actualHeight, boxMesh, windows }, scale) {
   boxMesh.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
+  const numFloors = Math.round(actualHeight * 3)
+  for (let { windowMesh, thisX, thisZ, i } of windows) {
+    windowMesh.position.set(worldX - focus.x + thisX, (i/numFloors) * actualHeight * scale, worldZ - focus.z + thisZ)
+  }
 }
 
 const boxMaterialBaseParameters = {
@@ -51,6 +60,33 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   outlineMesh1.layers.set(1)
   outlineMesh2.layers.set(1)
   outlineMesh2.renderOrder = -998
+  // Window stuff
+  const numFloors = Math.round(actualHeight * 3)
+  const numWindows = 4
+  const windows = []
+  for (let i = 0; i <= numFloors; i++) {
+      for (let x = 0; x <= numWindows; x++) {
+          for (let z = 0; z <= numWindows; z++) {
+              if (x != 0 && z != 0 && x != numWindows && z != numWindows) continue
+              // todo: fix orientation
+              const windowGeometry= new THREE.PlaneGeometry(1, 1, 1, 1, 1, 1)
+              const windowMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                specular: 0xffffff,
+              })
+              const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial)
+              const thisX = (x / numWindows - 0.5) * 0.8
+              const thisZ = (z / numWindows - 0.5) * 0.8
+              windowMesh.scale.set(0.1, 0.1, 0.1)
+              windowMesh.position.set(worldX - focus.x + thisX, (i/numFloors) * actualHeight * scale, worldZ - focus.z + thisZ)
+              windowMesh.castShadow = true
+              windowMesh.receiveShadow = true
+              windowMesh.layers.set(1)
+              windows.push({windowMesh, thisX, thisZ, i})
+              addToScene(windowMesh)
+          }
+      }
+  }
   // Add to map and scene
   addToGridCellMap({
     type: 'box',
@@ -61,6 +97,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     boxMesh,
     outlineMesh1,
     outlineMesh2,
+    windows
   })
   addToScene(boxMesh)
   boxMesh.layers.enable(0)
