@@ -55,16 +55,13 @@ export function setupGUI(cityscape) {
 
   // Lighting parameters
   const bloomParametersFolder = gui.addFolder('Bloom Parameters')
-  bloomParametersFolder.add(parameters, 'exposure', 0, 3).onChange((v) => {
-    cityscape.renderer.toneMappingExposure = Math.pow(v, 4.0)
-  })
   bloomParametersFolder.add(parameters, 'bloomStrength', 0, 3).onChange((v) => {
     cityscape.bloomComposer.passes[1].strength = v
   })
   bloomParametersFolder.add(parameters, 'bloomRadius', 0, 1).onChange((v) => {
     cityscape.bloomComposer.passes[1].radius = v
   })
-  bloomParametersFolder.add(parameters, 'bloomThreshold', 0, 1).onChange((v) => {
+  bloomParametersFolder.add(parameters, 'bloomThreshold', 0, 2).onChange((v) => {
     cityscape.bloomComposer.passes[1].threshold = v
   })
 
