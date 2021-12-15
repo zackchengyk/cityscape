@@ -22,12 +22,14 @@ export function setupGUI(cityscape) {
     exposure: 1.02,
     zoom: 0.25,
     // Lighting
+    windowEmissivity: 1,
     ambientLightIntensity: 0.4,
     dirLightIntensity: 0.6,
     // Bloom
     bloomStrength: 1.5,
     bloomRadius: 0,
     bloomThreshold: 0,
+    bloomWindowEmissivity: 0,
     bloomAmbientLightIntensity: 0.2,
     bloomDirLightIntensity: 0.2,
   }
@@ -73,6 +75,7 @@ export function setupGUI(cityscape) {
 
   // Lighting parameters
   const lightParametersFolder = gui.addFolder('Lighting')
+  lightParametersFolder.add(parameters, 'windowEmissivity', 0, 2)
   lightParametersFolder.add(parameters, 'ambientLightIntensity', 0, 2)
   lightParametersFolder.add(parameters, 'dirLightIntensity', 0, 2)
 
@@ -87,6 +90,7 @@ export function setupGUI(cityscape) {
   bloomParametersFolder.add(parameters, 'bloomThreshold', 0, 2).onChange((v) => {
     cityscape.bloomComposer.passes[1].threshold = v
   })
+  bloomParametersFolder.add(parameters, 'bloomWindowEmissivity', 0, 2)
   bloomParametersFolder.add(parameters, 'bloomAmbientLightIntensity', 0, 2)
   bloomParametersFolder.add(parameters, 'bloomDirLightIntensity', 0, 2)
 

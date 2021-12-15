@@ -1,7 +1,28 @@
 import * as THREE from 'three'
 import { getNoise, getPrimaryAndSecondaryColorModified, HEIGHT_SEED } from '/js/color'
+import { darkMaterial } from '/js/config'
 import { focus } from '/js/movement'
 import { generateOutlineMesh } from '/js/outline'
+
+export function enableBloomModeBox(cityscape, v) {
+  if (!v.isGlowing) {
+    v.storedMaterial = v.boxMesh.material
+    v.boxMesh.material = darkMaterial
+  }
+  if (cityscape.params.bloomWindowEmissivity != null) {
+    windowMaterial.emissiveIntensity = cityscape.params.bloomWindowEmissivity
+  }
+}
+
+export function disableBloomModeBox(cityscape, v) {
+  if (!v.isGlowing) {
+    v.boxMesh.material = v.storedMaterial
+    v.storedMaterial = undefined
+  }
+  if (cityscape.params.windowEmissivity != null) {
+    windowMaterial.emissiveIntensity = cityscape.params.windowEmissivity
+  }
+}
 
 export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2, windowGroup }) {
   removeFromScene(boxMesh)

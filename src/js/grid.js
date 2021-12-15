@@ -1,6 +1,5 @@
 import * as THREE from 'three'
-import { darkMaterial } from '/js/config'
-import { clearBox, updateBox, fillWithBox } from '/js/box'
+import { clearBox, updateBox, fillWithBox, enableBloomModeBox, disableBloomModeBox } from '/js/box'
 import { focus, getSpeed } from '/js/movement'
 import { generateStreets, isStreetPosition } from '/js/streets'
 
@@ -8,19 +7,37 @@ import { generateStreets, isStreetPosition } from '/js/streets'
 const gridCellMap = new Map()
 
 // TODO: REFACTOR
-export function darkenNonGlowingGridCells() {
+export function enableBloomModeGrid(cityscape) {
   gridCellMap.forEach((v) => {
-    if (!v.isGlowing) {
-      v.storedMaterial = v.boxMesh.material
-      v.boxMesh.material = darkMaterial
+    switch (v.type) {
+      case 'street': {
+        break
+      }
+      case 'box': {
+        enableBloomModeBox(cityscape, v)
+        break
+      }
+      default: {
+        console.error('what is in this grid cell lol')
+        break
+      }
     }
   })
 }
-export function unDarkenNonGlowingGridCells() {
-  gridCellMap.forEach((v, k) => {
-    if (!v.isGlowing) {
-      v.boxMesh.material = v.storedMaterial
-      v.storedMaterial = undefined
+export function disableBloomModeGrid(cityscape) {
+  gridCellMap.forEach((v) => {
+    switch (v.type) {
+      case 'street': {
+        break
+      }
+      case 'box': {
+        disableBloomModeBox(cityscape, v)
+        break
+      }
+      default: {
+        console.error('what is in this grid cell lol')
+        break
+      }
     }
   })
 }
