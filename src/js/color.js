@@ -1,7 +1,8 @@
+import * as THREE from 'three'
 import { Noise } from 'noisejs'
 
 export const PHI = 1.618
-export const NOISE_RATIO = 0.05
+export const NOISE_RATIO = 0.15
 
 export const THEMES = {
   GOTHIC: { s: 0.2, l: 0.2 },
@@ -15,8 +16,9 @@ export const COLOR_BASE = 0.05
 
 export function getBase(x, y, seed) {
   const noise = new Noise(Math.random())
+  const noiseFrequency = 0.05
   noise.seed(seed)
-  return (noise.simplex2(x / 100, y / 100) + 1) / 2
+  return (noise.simplex2(x * noiseFrequency, y * noiseFrequency) + 1) / 2
 }
 
 export function getNoise(x, y, p) {
@@ -33,7 +35,7 @@ export function getNoise(x, y, p) {
 export function getPrimaryColor(x, y, s, l) {
   const base = getBase(x, y, COLOR_SEED)
   const noise = getNoise(x, y, COLOR_SEED)
-  const h = base + noise * NOISE_RATIO
+  const h = (base + noise * NOISE_RATIO) % 1
   const hslStr = hsl2string(h, s, l)
   return hslStr
 }
@@ -41,11 +43,26 @@ export function getPrimaryColor(x, y, s, l) {
 export function getSecondaryColor(x, y, s, l) {
   const base = getBase(x, y, COLOR_SEED)
   const noise = getNoise(x, y, COLOR_SEED)
-  const h = base + noise + PHI
+  const h = (base + noise * NOISE_RATIO + PHI) % 1
   const hslStr = hsl2string(h, s, l)
   return hslStr
 }
 
+export function getPrimaryAndSecondaryColorModified(x, y, s, l) {
+  const base = getBase(x, y, COLOR_SEED)
+  const noise = getNoise(x, y, COLOR_SEED)
+
+  let primaryH = (base + noise * NOISE_RATIO) % 1
+  primaryH = Math.round(primaryH * 20) / 20
+  const primaryColor = new THREE.Color(hsl2string(primaryH, s, l))
+
+  let secondaryH = (base + noise * NOISE_RATIO + PHI) % 1
+  secondaryH = Math.round(secondaryH * 20) / 20
+  const secondaryColor = new THREE.Color(hsl2string(secondaryH, s, l))
+
+  return [primaryColor, secondaryColor]
+}
+
 export function hsl2string(h, s, l) {
-  return `hsl(${Math.round(h * 255)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
+  return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`
 }

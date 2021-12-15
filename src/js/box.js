@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { getNoise, getPrimaryColor, getSecondaryColor, HEIGHT_SEED } from '/js/color'
+import { getNoise, getPrimaryAndSecondaryColorModified, HEIGHT_SEED } from '/js/color'
 import { focus } from '/js/movement'
 import { generateOutlineMesh } from '/js/outline'
 
@@ -22,8 +22,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   // Get random values
   const actualHeight = Math.ceil(getNoise(worldX, worldZ, HEIGHT_SEED) * 2) / 2
   const height = actualHeight * scale
-  const pc = getPrimaryColor(worldX, worldZ, 1, 0.5)
-  const sc = getSecondaryColor(worldX, worldZ, 1, 0.5)
+  const [pc, sc] = getPrimaryAndSecondaryColorModified(worldX, worldZ, 1, 0.5)
   // Box
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1)
   const boxMaterial = new THREE.MeshPhongMaterial({
