@@ -24,8 +24,8 @@ export function setupLighting(cityscape) {
   prevBlobRadius = cityscape.params.blobRadius
   const r = cityscape.params.blobRadius * 1.5
   dirLight.shadow.camera = new OrthographicCamera(-r, r, r, -r, -10, 10)
-  dirLight.shadow.mapSize.height = r * 200
-  dirLight.shadow.mapSize.width = r * 200
+  const dim = r * 100
+  dirLight.shadow.mapSize = new THREE.Vector2(dim, dim)
   dirLight.shadow.bias = -0.0001
   cityscape.renderer.shadowMap.enabled = true
   cityscape.renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -47,16 +47,16 @@ let prevBlobRadius = 0
 export function updateLighting(cityscape) {
   // Update based on blobRadius parameter
   if (prevBlobRadius !== cityscape.params.blobRadius) {
-    console.log('prevBlobRadius', prevBlobRadius)
-    console.log('cityscape.params.blobRadius', cityscape.params.blobRadius)
     prevBlobRadius = cityscape.params.blobRadius
     const r = cityscape.params.blobRadius * 1.5
     dirLight.shadow.camera.left = -r
     dirLight.shadow.camera.right = r
     dirLight.shadow.camera.top = r
     dirLight.shadow.camera.bottom = -r
-    dirLight.shadow.mapSize.height = r * 200
-    dirLight.shadow.mapSize.width = r * 200
+    dirLight.shadow.map.dispose()
+    dirLight.shadow.map = null
+    const dim = r * 100
+    dirLight.shadow.mapSize = new THREE.Vector2(dim, dim)
     dirLight.shadow.camera.updateProjectionMatrix()
   }
   // Update based on shadow parameter
