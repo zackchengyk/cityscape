@@ -58,6 +58,7 @@ function generateCar(scene, x, z, dir) {
   body.scale.set(0.25, 0.05, 0.15)
   body.position.set(0, 0.025, 0)
   body.receiveShadow = true
+  body.castShadow = true
   car.add(body)
 
   const hood = new THREE.Mesh(
@@ -67,6 +68,7 @@ function generateCar(scene, x, z, dir) {
   hood.scale.set(0.15, 0.08, 0.11)
   hood.position.set(0 + 0.03, 0.06, 0)
   hood.receiveShadow = true
+  hood.castShadow = true
   car.add(hood)
 
   const fwheels = new THREE.Mesh(
@@ -76,6 +78,7 @@ function generateCar(scene, x, z, dir) {
   fwheels.scale.set(0.05, 0.05, 0.16)
   fwheels.position.set(0 - 0.055, 0.01, 0)
   fwheels.receiveShadow = true
+  fwheels.castShadow = true
   car.add(fwheels)
 
   const bwheels = new THREE.Mesh(
@@ -85,6 +88,7 @@ function generateCar(scene, x, z, dir) {
   bwheels.scale.set(0.05, 0.05, 0.16)
   bwheels.position.set(0 + 0.055, 0.01, 0)
   bwheels.receiveShadow = true
+  bwheels.castShadow = true
   car.add(bwheels)
 
   car.position.x += x + carDisplacement[dir][0] * Math.random() - focus.x
