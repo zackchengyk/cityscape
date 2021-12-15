@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { darkMaterial } from './config'
 import { updateGrid, darkenNonGlowingGridCells, unDarkenNonGlowingGridCells } from '/js/grid'
-import { updateEntities, generateStreets } from '/js/streets'
+import { updateEntities } from '/js/streets'
 import { updateLighting, darkenPlane, unDarkenPlane } from '/js/lighting'
 import { updateMovement } from '/js/movement'
 import { updateRain } from '/js/weather'
@@ -20,7 +20,6 @@ export function animate(cityscape, currTime) {
   // Update things
   updateSize(cityscape)
   updateMovement(cityscape, deltaTime)
-  generateStreets(cityscape)
   updateGrid(cityscape)
   updateEntities(cityscape)
   updateLighting(cityscape)

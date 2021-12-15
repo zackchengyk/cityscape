@@ -118,9 +118,9 @@ function generateCars(cityscape, centerX, centerZ) {
       let dist = boxX - centerX
       let dist_squared = dist * dist - 3
       if (Math.random() > 0.5) {
-        generateCar(scene, boxX, centerZ - Math.sqrt(blobRadiusSq - dist_squared), 0)
+        generateCar(cityscape.scene, boxX, centerZ - Math.sqrt(blobRadiusSq - dist_squared), 0)
       } else {
-        generateCar(scene, boxX, centerZ + Math.sqrt(blobRadiusSq - dist_squared), 1)
+        generateCar(cityscape.scene, boxX, centerZ + Math.sqrt(blobRadiusSq - dist_squared), 1)
       }
     }
   }
@@ -131,9 +131,9 @@ function generateCars(cityscape, centerX, centerZ) {
       let dist = boxZ - centerZ
       let dist_squared = dist * dist - 3
       if (Math.random() > 0.5) {
-        generateCar(scene, centerX - Math.sqrt(blobRadiusSq - dist_squared), boxZ, 2)
+        generateCar(cityscape.scene, centerX - Math.sqrt(blobRadiusSq - dist_squared), boxZ, 2)
       } else {
-        generateCar(scene, centerX + Math.sqrt(blobRadiusSq - dist_squared), boxZ, 3)
+        generateCar(cityscape.scene, centerX + Math.sqrt(blobRadiusSq - dist_squared), boxZ, 3)
       }
     }
   }
@@ -196,8 +196,9 @@ function hasNearbyStreet(v, dir) {
   return false
 }
 
-export function generateStreets(blobRadius) {
+export function generateStreets(cityscape) {
   if (!genStreets) return
+  const blobRadius = cityscape.params.blobRadius
   const { x: focusX, z: focusZ } = focus
   const centerX = Math.round(focusX)
   const centerZ = Math.round(focusZ)

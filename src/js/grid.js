@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { clearBox, updateBox, fillWithBox } from '/js/box'
 import { focus, getSpeed } from '/js/movement'
-import { isStreetPosition } from '/js/streets'
+import { generateStreets, isStreetPosition } from '/js/streets'
 
 // Important
 const gridCellMap = new Map()
@@ -35,6 +35,9 @@ let prevFocusZ = Infinity
 let prevBlobRadius = 0
 export function updateGrid(cityscape) {
   // Note: this ASSUMES that all visible grid cells are within [-boundX, boundX], [-boundZ, boundZ]
+
+  // Prep streets
+  generateStreets(cityscape)
 
   // Get position
   const { x: focusX, z: focusZ } = focus
