@@ -18,23 +18,25 @@ export function updateBox({ worldX, worldZ, actualHeight, boxMesh }, scale) {
   boxMesh.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
 }
 
+const boxMaterialBaseParameters = {
+  stencilWrite: true,
+  stencilFunc: THREE.AlwaysStencilFunc,
+  stencilRef: 1,
+  stencilFuncMask: 0xff,
+  stencilFail: THREE.KeepStencilOp,
+  stencilZFail: THREE.KeepStencilOp,
+  stencilZPass: THREE.ReplaceStencilOp,
+}
 export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale) {
   // Get random values
   const actualHeight = Math.ceil(getNoise(worldX, worldZ, HEIGHT_SEED) * 2) / 2
-  const height = actualHeight * scale
   const [pc, sc] = getPrimaryAndSecondaryColorModified(worldX, worldZ, 1, 0.5)
   // Box
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1)
   const boxMaterial = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
-    stencilWrite: true,
-    stencilFunc: THREE.AlwaysStencilFunc,
-    stencilRef: 1,
-    stencilFuncMask: 0xff,
-    stencilFail: THREE.KeepStencilOp,
-    stencilZFail: THREE.KeepStencilOp,
-    stencilZPass: THREE.ReplaceStencilOp,
+    ...boxMaterialBaseParameters,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
   boxMesh.scale.set(0.8, actualHeight, 0.8)
