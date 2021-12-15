@@ -5,7 +5,7 @@ import { setupLighting } from '/js/lighting'
 import { setupMovement } from '/js/movement'
 import { setupRain } from '/js/weather'
 
-import Stats from '/../node_modules/stats.js/src/Stats.js'
+import Stats from 'three/examples/js/libs/stats.min.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'

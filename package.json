@@ -12,7 +12,6 @@
   "dependencies": {
     "noisejs": "^2.1.0",
     "prettier": "^2.5.1",
-    "stats.js": "^0.17.0",
     "three": "^0.135.0"
   }
 }
