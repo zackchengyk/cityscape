@@ -17,7 +17,7 @@ export function setupGUI(cityscape) {
     rain: false,
     blobRadius: 4,
     exposure: 1,
-    bloomStrength: 2,
+    bloomStrength: 1.5,
     bloomRadius: 0,
     bloomThreshold: 0,
   }

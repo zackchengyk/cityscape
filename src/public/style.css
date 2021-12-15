@@ -12,13 +12,13 @@ body {
   display: grid;
   align-items: center;
   justify-items: center;
-  background-color: #0a0b0e;
+  background-color: #0f1014;
 }
 
 #container {
   position: relative;
-  padding-top: 48%; /* 4:3 aspect */
-  width: 64%;
+  height: min(clamp(150px, 48vw, 720px), 90vh);
+  width: min(clamp(200px, 64vw, 960px), 120vh);
 }
 
 #cityscape {
@@ -26,4 +26,5 @@ body {
   inset: 0;
   display: block;
   border-radius: 10px;
+  box-shadow: 0 10px 20px black;
 }
