@@ -101,8 +101,8 @@ function setupCameraSceneRendererComposer(cityscape) {
 
   // Renderer
   cityscape.renderer = new THREE.WebGLRenderer({ canvas: cityscape.canvas })
-  // cityscape.renderer.toneMapping = THREE.CineonToneMapping
-  // cityscape.renderer.toneMappingExposure = cityscape.params.exposure
+  cityscape.renderer.toneMapping = THREE.LinearToneMapping
+  cityscape.renderer.toneMappingExposure = cityscape.params.exposure
   cityscape.renderer.setPixelRatio(window.devicePixelRatio) // todo GUI?
   cityscape.renderer.setClearColor(0x1e1a2b) // todo GUI?: make into GUI-changeable value, with some default, in a file with all the others
   cityscape.renderer.setSize(screenX, screenY)

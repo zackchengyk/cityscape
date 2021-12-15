@@ -16,6 +16,7 @@ export function setupGUI(cityscape) {
     shadows: true,
     rain: false,
     blobRadius: 4,
+    exposure: 1.125,
     // Lighting
     ambientLightIntensity: 0.6,
     dirLightIntensity: 0.6,
@@ -27,7 +28,7 @@ export function setupGUI(cityscape) {
     bloomDirLightIntensity: 0,
   }
   const gui = new GUI()
-  gui.domElement.style = 'font-size: 1em'
+  // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements
 
   // Unorganized parameters
   gui.add(parameters, 'scene', ['Bloom + Scene', 'Bloom only', 'Scene only']).onChange((v) => {
@@ -57,6 +58,9 @@ export function setupGUI(cityscape) {
   gui.add(parameters, 'timeOfDay', 0, 24)
   gui.add(parameters, 'shadows')
   gui.add(parameters, 'rain')
+  gui.add(parameters, 'exposure', 0, 2).onChange((v) => {
+    cityscape.renderer.toneMappingExposure = v
+  })
 
   // Lighting parameters
   const lightParametersFolder = gui.addFolder('Light Parameters')
