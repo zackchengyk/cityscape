@@ -14,6 +14,8 @@ export function setupGUI(cityscape) {
     // Camera / Renderer
     exposure: 1.02,
     zoom: 0.25,
+    autoRotate: false,
+    autoRotateSpeed: 0.2,
     // Lighting
     windowEmissivity: 1,
     ambientLightIntensity: 0.4,
@@ -65,6 +67,12 @@ export function setupGUI(cityscape) {
     cityscape.renderer.toneMappingExposure = v
   })
   cameraParametersFolder.add(parameters, 'zoom', MIN_ZOOM, MAX_ZOOM)
+  cameraParametersFolder.add(parameters, 'autoRotate').onChange((v) => {
+    cityscape.orbitControls.autoRotate = v
+  })
+  cameraParametersFolder.add(parameters, 'autoRotateSpeed', 0, 20).onChange((v) => {
+    cityscape.orbitControls.autoRotateSpeed = v
+  })
 
   // Lighting parameters
   const lightParametersFolder = gui.addFolder('Lighting')

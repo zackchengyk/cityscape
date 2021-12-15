@@ -156,4 +156,6 @@ function setupCameraSceneRendererComposer(cityscape) {
   })
   cityscape.orbitControls.enableDamping = true
   cityscape.orbitControls.dampingFactor = 0.1
+  cityscape.orbitControls.autoRotate = false
+  cityscape.orbitControls.autoRotateSpeed = 2
 }
