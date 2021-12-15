@@ -13,6 +13,7 @@ body {
   align-items: center;
   justify-items: center;
   background-color: #0f1014;
+  cursor: none;
 }
 
 #container {
@@ -27,4 +28,16 @@ body {
   display: block;
   border-radius: 10px;
   box-shadow: 0 10px 20px black;
+}
+
+.circle {
+  position: absolute;
+  border: solid 1px #fff;
+  background-color: #fff;
+  mix-blend-mode: difference;
+  width: 15px;
+  height: 15px;
+  margin-top: 20px;
+  margin-left: 20px;
+  border-radius: 50%;
 }
