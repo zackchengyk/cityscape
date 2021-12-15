@@ -22,7 +22,7 @@ export function animate(cityscape, currTime) {
   updateMovement(cityscape, deltaTime)
   generateStreets(cityscape)
   updateGrid(cityscape)
-  updateEntities(cityscape.scene)
+  updateEntities(cityscape)
   updateLighting(cityscape)
   updateRain(cityscape)
 

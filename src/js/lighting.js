@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { OrthographicCamera } from 'three'
-import { BLOB_RADIUS } from '/js/config'
 
 let ambientLight, dirLight, currTime
 let planeMesh, planeMaterial
@@ -22,7 +21,8 @@ export function setupLighting(cityscape) {
 
   // Directional light's shadows
   dirLight.castShadow = true
-  const r = BLOB_RADIUS * 1.5
+  prevBlobRadius = cityscape.params.blobRadius
+  const r = cityscape.params.blobRadius * 1.5
   dirLight.shadow.camera = new OrthographicCamera(-r, r, r, -r, -10, 10)
   dirLight.shadow.mapSize.height = r * 200
   dirLight.shadow.mapSize.width = r * 200
@@ -43,7 +43,22 @@ export function setupLighting(cityscape) {
 }
 
 // Animate function
+let prevBlobRadius = 0
 export function updateLighting(cityscape) {
+  // Update based on blobRadius parameter
+  if (prevBlobRadius !== cityscape.params.blobRadius) {
+    console.log('prevBlobRadius', prevBlobRadius)
+    console.log('cityscape.params.blobRadius', cityscape.params.blobRadius)
+    prevBlobRadius = cityscape.params.blobRadius
+    const r = cityscape.params.blobRadius * 1.5
+    dirLight.shadow.camera.left = -r
+    dirLight.shadow.camera.right = r
+    dirLight.shadow.camera.top = r
+    dirLight.shadow.camera.bottom = -r
+    dirLight.shadow.mapSize.height = r * 200
+    dirLight.shadow.mapSize.width = r * 200
+    dirLight.shadow.camera.updateProjectionMatrix()
+  }
   // Update based on shadow parameter
   dirLight.castShadow = cityscape.params.shadows
   // Update based on time parameter

@@ -15,8 +15,9 @@ export function setupGUI(cityscape) {
     timeOfDay: 12,
     shadows: true,
     rain: false,
+    blobRadius: 4,
     exposure: 1,
-    bloomStrength: 1,
+    bloomStrength: 2,
     bloomRadius: 0,
     bloomThreshold: 0,
   }
@@ -45,6 +46,9 @@ export function setupGUI(cityscape) {
     cityscape.shaderComposer.removePass(cityscape.shaderComposer.passes[1])
     cityscape.shaderComposer.addPass(new ShaderPass(existingShaderMaterial, 'boxesTexture'))
   })
+  gui.add(parameters, 'blobRadius', 0, 8).step(1)
+
+  // Unorganized parameters
   gui.add(parameters, 'timeOfDay', 0, 24)
   gui.add(parameters, 'shadows')
   gui.add(parameters, 'rain')

@@ -1,10 +1,6 @@
 import * as THREE from 'three'
 import { focus } from '/js/movement'
-import { genStreets, BLOB_RADIUS } from '/js/config'
-
-const BOUND_X = BLOB_RADIUS
-const BOUND_Z = BLOB_RADIUS
-const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
+import { genStreets } from '/js/config'
 
 // Car stuff
 
@@ -22,14 +18,14 @@ const carRot = [Math.PI / 2, -Math.PI / 2, Math.PI, 0]
 
 // Drive on the right side of the road
 const carDisplacement = [
-  [-0.40, 0],
-  [0.40, 0],
-  [0, 0.40],
-  [0, -0.40],
+  [-0.4, 0],
+  [0.4, 0],
+  [0, 0.4],
+  [0, -0.4],
 ]
-function carWithinBoundsRelative(relativeX, relativeZ) {
+function carWithinBoundsRelative(blobRadiusSq, relativeX, relativeZ) {
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  return BLOB_RADIUS_SQUARED + 10 > distanceSquared
+  return blobRadiusSq + 10 > distanceSquared
 }
 
 function generateCar(scene, x, z, dir) {
@@ -111,39 +107,45 @@ function generateCar(scene, x, z, dir) {
   })
 }
 
-function generateCars(scene, centerX, centerZ, focusX, focusZ) {
+function generateCars(cityscape, centerX, centerZ) {
+  const blobRadius = cityscape.params.blobRadius
+  const blobRadiusSq = blobRadius * blobRadius
+
   if (Math.random() > carProbability) return
-  for (let boxX = centerX - BLOB_RADIUS; boxX <= centerX + BLOB_RADIUS; boxX++) {
+  for (let boxX = centerX - blobRadius; boxX <= centerX + blobRadius; boxX++) {
     if (Xstreets.has(boxX)) {
       if (Math.random() > carProbability) continue
       let dist = boxX - centerX
       let dist_squared = dist * dist - 3
       if (Math.random() > 0.5) {
-        generateCar(scene, boxX, centerZ - Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), 0)
+        generateCar(scene, boxX, centerZ - Math.sqrt(blobRadiusSq - dist_squared), 0)
       } else {
-        generateCar(scene, boxX, centerZ + Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), 1)
+        generateCar(scene, boxX, centerZ + Math.sqrt(blobRadiusSq - dist_squared), 1)
       }
     }
   }
-  for (let boxZ = centerZ - BLOB_RADIUS; boxZ <= centerZ + BLOB_RADIUS; boxZ++) {
+
+  for (let boxZ = centerZ - blobRadius; boxZ <= centerZ + blobRadius; boxZ++) {
     if (Zstreets.has(boxZ)) {
       if (Math.random() > carProbability) continue
       let dist = boxZ - centerZ
       let dist_squared = dist * dist - 3
       if (Math.random() > 0.5) {
-        generateCar(scene, centerX - Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), boxZ, 2)
+        generateCar(scene, centerX - Math.sqrt(blobRadiusSq - dist_squared), boxZ, 2)
       } else {
-        generateCar(scene, centerX + Math.sqrt(BLOB_RADIUS_SQUARED - dist_squared), boxZ, 3)
+        generateCar(scene, centerX + Math.sqrt(blobRadiusSq - dist_squared), boxZ, 3)
       }
     }
   }
 }
 
-export function updateEntities(scene) {
+export function updateEntities(cityscape) {
   // Get position
   const { x: focusX, z: focusZ } = focus
   const roundedFocusX = Math.round(focusX)
   const roundedFocusZ = Math.round(focusZ)
+  const blobRadius = cityscape.params.blobRadius
+  const blobRadiusSq = blobRadius * blobRadius
 
   // Move cars
   Cars.forEach((obj) => {
@@ -155,10 +157,10 @@ export function updateEntities(scene) {
   // Delete irrelevant cars
   const elementsToDelete = []
   Cars.forEach((obj) => {
-    if (!carWithinBoundsRelative(obj.car.position.x, obj.car.position.z)) {
-      scene.remove(obj.car)
+    if (!carWithinBoundsRelative(blobRadiusSq, obj.car.position.x, obj.car.position.z)) {
+      cityscape.scene.remove(obj.car)
       obj.car.children.forEach((child) => {
-        scene.remove(child)
+        cityscape.scene.remove(child)
         if (child.type === 'SpotLight') {
           child.dispose()
         } else if (child.type === 'Object3D') {
@@ -175,7 +177,7 @@ export function updateEntities(scene) {
   })
 
   // Generate more entities
-  generateCars(scene, roundedFocusX, roundedFocusZ)
+  generateCars(cityscape, roundedFocusX, roundedFocusZ)
 }
 
 // Street stuff
@@ -194,40 +196,40 @@ function hasNearbyStreet(v, dir) {
   return false
 }
 
-export function generateStreets(cityscape) {
+export function generateStreets(blobRadius) {
   if (!genStreets) return
   const { x: focusX, z: focusZ } = focus
   const centerX = Math.round(focusX)
   const centerZ = Math.round(focusZ)
 
-  for (let boxX = centerX - BOUND_X; boxX < XstreetsLimits.low; boxX++) {
+  for (let boxX = centerX - blobRadius; boxX < XstreetsLimits.low; boxX++) {
     if (hasNearbyStreet(boxX, 0)) continue
     if (Math.random() < streetProbability) {
       Xstreets.add(boxX)
     }
   }
-  XstreetsLimits.low = Math.min(XstreetsLimits.low, centerX - BOUND_X)
-  for (let boxX = XstreetsLimits.high + 1; boxX <= centerX + BOUND_X; boxX++) {
+  XstreetsLimits.low = Math.min(XstreetsLimits.low, centerX - blobRadius)
+  for (let boxX = XstreetsLimits.high + 1; boxX <= centerX + blobRadius; boxX++) {
     if (hasNearbyStreet(boxX, 0)) continue
     if (Math.random() < streetProbability) {
       Xstreets.add(boxX)
     }
   }
-  XstreetsLimits.high = Math.max(XstreetsLimits.high, centerX + BOUND_X)
-  for (let boxZ = centerZ - BOUND_Z; boxZ < ZstreetsLimits.low; boxZ++) {
+  XstreetsLimits.high = Math.max(XstreetsLimits.high, centerX + blobRadius)
+  for (let boxZ = centerZ - blobRadius; boxZ < ZstreetsLimits.low; boxZ++) {
     if (hasNearbyStreet(boxZ, 1)) continue
     if (Math.random() < streetProbability) {
       Zstreets.add(boxZ)
     }
   }
-  ZstreetsLimits.low = Math.min(ZstreetsLimits.low, centerZ - BOUND_Z)
-  for (let boxZ = ZstreetsLimits.high + 1; boxZ <= centerZ + BOUND_Z; boxZ++) {
+  ZstreetsLimits.low = Math.min(ZstreetsLimits.low, centerZ - blobRadius)
+  for (let boxZ = ZstreetsLimits.high + 1; boxZ <= centerZ + blobRadius; boxZ++) {
     if (hasNearbyStreet(boxZ, 1)) continue
     if (Math.random() < streetProbability) {
       Zstreets.add(boxZ)
     }
   }
-  ZstreetsLimits.high = Math.max(ZstreetsLimits.high, centerZ + BOUND_Z)
+  ZstreetsLimits.high = Math.max(ZstreetsLimits.high, centerZ + blobRadius)
 }
 
 export function isStreetPosition(x, z) {

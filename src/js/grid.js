@@ -2,13 +2,9 @@ import * as THREE from 'three'
 import { clearBox, updateBox, fillWithBox } from '/js/box'
 import { focus, getSpeed } from '/js/movement'
 import { isStreetPosition } from '/js/streets'
-import { BLOB_RADIUS } from '/js/config'
 
 // Important
 const gridCellMap = new Map()
-const BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
-const BOUND_X = BLOB_RADIUS
-const BOUND_Z = BLOB_RADIUS
 
 // TODO: REFACTOR
 export function darkenNonGlowingGridCells(darkMaterial) {
@@ -36,17 +32,28 @@ export function setupGrid(cityscape) {
 // Animate function
 let prevFocusX = Infinity
 let prevFocusZ = Infinity
+let prevBlobRadius = 0
 export function updateGrid(cityscape) {
   // Note: this ASSUMES that all visible grid cells are within [-boundX, boundX], [-boundZ, boundZ]
 
   // Get position
   const { x: focusX, z: focusZ } = focus
 
-  // Debounce recalculation things
+  // Get blob radius
+  const blobRadius = cityscape.params.blobRadius
+  const blobRadiusSq = blobRadius * blobRadius
+
+  // Debounce: update only if blobRadius has changed or position has changed
   const updateThreshold = Math.max(getSpeed() * 0.5, 0.002)
-  if (Math.abs(focusX - prevFocusX) < updateThreshold && Math.abs(focusZ - prevFocusZ) < updateThreshold) {
+  if (
+    prevBlobRadius === blobRadius &&
+    Math.abs(focusX - prevFocusX) < updateThreshold &&
+    Math.abs(focusZ - prevFocusZ) < updateThreshold
+  ) {
     return
   }
+  const maxOfPrevAndNewBR = Math.max(prevBlobRadius, blobRadius)
+  prevBlobRadius = blobRadius
   prevFocusX = focusX
   prevFocusZ = focusZ
 
@@ -54,11 +61,15 @@ export function updateGrid(cityscape) {
   const roundedFocusX = Math.round(focusX)
   const roundedFocusZ = Math.round(focusZ)
   const kvPairsToDelete = []
+  const worldXStart = roundedFocusX - maxOfPrevAndNewBR
+  const worldXEnd = roundedFocusX + maxOfPrevAndNewBR
+  const worldZStart = roundedFocusZ - maxOfPrevAndNewBR
+  const worldZEnd = roundedFocusZ + maxOfPrevAndNewBR
 
   // Iterate over grid cells
-  for (let worldX = roundedFocusX - BOUND_X; worldX <= roundedFocusX + BOUND_X; worldX++) {
-    for (let worldZ = roundedFocusZ - BOUND_Z; worldZ <= roundedFocusZ + BOUND_Z; worldZ++) {
-      const scale = withinBounds(worldX, worldZ)
+  for (let worldX = worldXStart; worldX <= worldXEnd; worldX++) {
+    for (let worldZ = worldZStart; worldZ <= worldZEnd; worldZ++) {
+      const scale = withinBounds(blobRadiusSq, worldX, worldZ)
       const gridCellKey = xzToKey(worldX, worldZ)
       if (scale > 0) {
         if (gridCellMap.has(gridCellKey)) {
@@ -145,11 +156,10 @@ function xzToKey(x, z) {
 }
 
 // FIXME: rename this function
-function withinBounds(worldX, worldZ) {
+function withinBounds(blobRadiusSq, worldX, worldZ) {
   const relativeX = worldX - focus.x
   const relativeZ = worldZ - focus.z
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  const result =
-    THREE.MathUtils.smoothstep(BLOB_RADIUS_SQUARED - distanceSquared, 0, BLOB_RADIUS_SQUARED) - 0.01
+  const result = THREE.MathUtils.smoothstep(blobRadiusSq - distanceSquared, 0, blobRadiusSq) - 0.01
   return result
 }
