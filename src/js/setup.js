@@ -74,7 +74,7 @@ export function setup(cityscape) {
   setupMovement(cityscape)
 
   // Setup click
-  setupClick()
+  setupClick(cityscape)
   // Setup geometry
   setupGrid(cityscape)
 
