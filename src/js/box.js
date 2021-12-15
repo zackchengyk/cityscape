@@ -112,6 +112,8 @@ const windowMaterial = new THREE.MeshLambertMaterial({
   emissive: 0xffffff,
   emissiveIntensity: 0.2,
 })
+const maxWindowNum = 5
+const largeWindowGeometry = new THREE.PlaneGeometry(0.65, 0.07, 1, 1)
 
 // Helper
 function generateWindowGroup(actualHeight, actualWidth) {
@@ -133,15 +135,25 @@ function generateWindowGroup(actualHeight, actualWidth) {
     windowGroup.rotateY((face * Math.PI) / 2)
     // For each floor
     for (let floor = 0; floor < numberOfFloors; floor++) {
-      // For each window
-      for (let windowNumber = 0; windowNumber < windowsPerFloor; windowNumber++) {
-        const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial)
+      if (windowsPerFloor > maxWindowNum) {
+        const windowMesh = new THREE.Mesh(largeWindowGeometry, windowMaterial)
         const buildingY = offsetFromGround - halfHeight + floor * heightPerFloor
-        const buildingX = windowNumberToBuildingX(windowNumber)
+        const buildingX = 0
         const buildingZ = halfWidth + 0.01
         windowMesh.position.set(buildingX, buildingY, buildingZ)
         windowMesh.layers.enable(1)
         windowGroup.attach(windowMesh)
+      } else {
+        // For each window
+        for (let windowNumber = 0; windowNumber < windowsPerFloor; windowNumber++) {
+          const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial)
+          const buildingY = offsetFromGround - halfHeight + floor * heightPerFloor
+          const buildingX = windowNumberToBuildingX(windowNumber)
+          const buildingZ = halfWidth + 0.01
+          windowMesh.position.set(buildingX, buildingY, buildingZ)
+          windowMesh.layers.enable(1)
+          windowGroup.attach(windowMesh)
+        }
       }
     }
   }
