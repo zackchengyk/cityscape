@@ -36,6 +36,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   const boxMaterial = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
+    shininess: 40,
     ...boxMaterialBaseParameters,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)

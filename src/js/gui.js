@@ -17,7 +17,7 @@ export function setupGUI(cityscape) {
     shadows: true,
     rain: false,
     blobRadius: 4,
-    exposure: 1.125,
+    exposure: 1.02,
     // Lighting
     ambientLightIntensity: 0.4,
     dirLightIntensity: 0.6,

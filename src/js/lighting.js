@@ -88,7 +88,7 @@ function updateBasedOnTimeOfDay(cityscape) {
     THREE.MathUtils.smoothstep(hour, 18, 19) * (1 - THREE.MathUtils.smoothstep(hour, 19, 21)) * 0.75
 
   // Light position
-  dirLight.position.set(sint + 0.5 - 0.25, 0.5 - cost, -sint - 0.5 - 0.25)
+  dirLight.position.set(sint + 0.5 - 1.5, 0.5 - cost, -sint - 0.5 - 1.5)
 
   // Light parameters
   cityscape.params.ambientLightIntensity = THREE.MathUtils.mapLinear(dayness, 0, 1, 0.1, 0.5)
