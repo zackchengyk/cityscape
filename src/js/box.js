@@ -113,7 +113,7 @@ const windowMaterial = new THREE.MeshLambertMaterial({
     emissive: 0xffffff,
     emissiveIntensity: 0.2,
 })
-const maxWindowNum = 5
+const maxWindowNum = 6
 const largeWindowGeometry = new THREE.PlaneGeometry(0.65, 0.07, 1, 1)
 
 // Helper
