@@ -23,7 +23,7 @@ export function clearBox(removeFromScene, { boxMesh, outlineMesh1, outlineMesh2,
 
 export function updateBox({ worldX, worldZ, actualHeight, boxMesh, windowGroup }, scale) {
   boxMesh.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
-  windowGroup.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
+  windowGroup.position.copy(boxMesh.position)
 }
 
 const boxMaterialBaseParameters = {
@@ -38,6 +38,7 @@ const boxMaterialBaseParameters = {
 export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale) {
   // Get random values
   const actualHeight = Math.ceil(getNoise(worldX, worldZ, HEIGHT_SEED) * 2) / 2
+  const actualWidth = 0.8 // is a magic number still magic if it has a variable name 🤔
   const [pc, sc] = getPrimaryAndSecondaryColorModified(worldX, worldZ, 1, 0.5)
   // Box
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1)
@@ -48,7 +49,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     ...boxMaterialBaseParameters,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
-  boxMesh.scale.set(0.8, actualHeight, 0.8)
+  boxMesh.scale.set(actualWidth, actualHeight, actualWidth)
   boxMesh.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
   // Shadow stuff
   boxMesh.castShadow = true
@@ -61,44 +62,9 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   outlineMesh2.layers.set(1)
   outlineMesh2.renderOrder = -998
   // Window stuff
-  const numFloors = Math.round(actualHeight * 3)
-  const numWindows = 4
-  const windowGroup = new THREE.Group()
-  const windowGeometry = new THREE.PlaneGeometry(1, 1, 1, 1, 1, 1)
-  const windowMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    specular: 0xffffff,
-  })
-  for (let i = 0; i <= numFloors; i++) {
-    for (let x = 0; x <= numWindows; x++) {
-      for (let z = 0; z <= numWindows; z++) {
-        if (x != 0 && z != 0 && x != numWindows && z != numWindows) continue
-        if (
-          (x == 0 && z == 0) ||
-          (x == 0 && z == numWindows) ||
-          (x == numWindows && z == 0) ||
-          (x == numWindows && z == numWindows)
-        )
-          continue
-        // todo: fix orientation
-        const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial)
-        const thisX = (x / numWindows - 0.5) * 0.85
-        const thisZ = (z / numWindows - 0.5) * 0.85
-        windowMesh.scale.set(0.1, 0.1, 0.1)
-        if (x == numWindows || x == 0) {
-          windowMesh.rotateY(Math.PI / 2)
-        }
-        // windowMesh.rotateY(Math.PI / 2)
-        windowMesh.position.set(thisX, (i / numFloors - 0.6) * actualHeight, thisZ)
-        // windowMesh.castShadow = true
-        // windowMesh.receiveShadow = true
-        windowMesh.layers.set(1)
-        windowGroup.add(windowMesh)
-      }
-    }
-  }
-  windowGroup.position.set(worldX - focus.x, (scale - 0.5) * actualHeight, worldZ - focus.z)
-  addToScene(windowGroup)
+  const windowGroup = generateWindowGroup(actualHeight, actualWidth)
+  windowGroup.position.copy(boxMesh.position)
+  if (windowGroup) addToScene(windowGroup)
   // Add to map and scene
   addToGridCellMap({
     type: 'box',
@@ -114,4 +80,49 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   addToScene(boxMesh)
   boxMesh.layers.enable(0)
   boxMesh.layers.enable(1)
+}
+
+// Todo? perhaps these should be GUI variables
+const heightPerFloor = 1 / 4
+const offsetFromGround = 1 / 8
+const offsetFromSide = 1 / 8
+const windowGeometry = new THREE.PlaneGeometry(0.065, 0.07, 1, 1)
+const windowMaterial = new THREE.MeshLambertMaterial({
+  emissive: 0xffffff,
+  emissiveIntensity: 0.2,
+})
+
+// Helper
+function generateWindowGroup(actualHeight, actualWidth) {
+  const numberOfFloors = Math.floor(actualHeight / heightPerFloor)
+  const windowsPerFloor = THREE.MathUtils.randInt(3, 10) // Todo? make this deterministic, and a nicer distribution
+  const halfHeight = actualHeight / 2
+  const halfWidth = actualWidth / 2
+  const windowsPerFloorMinusOne = windowsPerFloor - 1
+
+  // Helper function to reduce computations
+  const temp1 = -halfWidth + offsetFromSide
+  const temp2 = (actualWidth - offsetFromSide - offsetFromSide) / windowsPerFloorMinusOne
+  const windowNumberToBuildingX = (n) => temp1 + temp2 * n
+
+  const windowGroup = new THREE.Group()
+  // For each face
+  for (let face = 0; face < 4; face++) {
+    // Rotate the thing, then attach to the next face
+    windowGroup.rotateY((face * Math.PI) / 2)
+    // For each floor
+    for (let floor = 0; floor < numberOfFloors; floor++) {
+      // For each window
+      for (let windowNumber = 0; windowNumber < windowsPerFloor; windowNumber++) {
+        const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial)
+        const buildingY = offsetFromGround - halfHeight + floor * heightPerFloor
+        const buildingX = windowNumberToBuildingX(windowNumber)
+        const buildingZ = halfWidth + 0.01
+        windowMesh.position.set(buildingX, buildingY, buildingZ)
+        windowMesh.layers.enable(1)
+        windowGroup.attach(windowMesh)
+      }
+    }
+  }
+  return windowGroup
 }
