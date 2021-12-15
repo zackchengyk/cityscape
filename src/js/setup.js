@@ -4,6 +4,7 @@ import { setupGrid } from '/js/grid'
 import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
 import { setupMovement } from '/js/movement'
+import { setupClick } from '/js/click'
 import { setupRain } from '/js/weather'
 
 import Stats from 'three/examples/js/libs/stats.min.js'
@@ -72,6 +73,8 @@ export function setup(cityscape) {
   // Setup gamepad and listeners
   setupMovement(cityscape)
 
+  // Setup click
+  setupClick()
   // Setup geometry
   setupGrid(cityscape)
 
