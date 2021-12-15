@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { darkMaterial } from './config'
 import { updateGrid, darkenNonGlowingGridCells, unDarkenNonGlowingGridCells } from '/js/grid'
 import { updateEntities } from '/js/streets'
-import { updateLighting, darkenPlane, unDarkenPlane } from '/js/lighting'
+import { updateLighting, enableBloomModeLighting, disableBloomModeLighting } from '/js/lighting'
 import { updateMovement } from '/js/movement'
 import { updateRain } from '/js/weather'
 
@@ -46,15 +46,15 @@ function renderBloomToTexture(cityscape) {
   cityscape.renderer.setClearColor('black') // Do not interfere with bloom
 
   // Temporarily swap out non-glowing objects' materials
-  darkenPlane(darkMaterial)
+  enableBloomModeLighting(cityscape)
   darkenNonGlowingGridCells(darkMaterial)
 
   // Render
   cityscape.bloomComposer.render()
 
   // Revert non-glowing objects' materials
+  disableBloomModeLighting(cityscape)
   unDarkenNonGlowingGridCells()
-  unDarkenPlane()
 
   // Revert clear color
   cityscape.renderer.setClearColor(tempRendererClearColor)

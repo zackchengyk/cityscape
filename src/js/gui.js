@@ -16,10 +16,15 @@ export function setupGUI(cityscape) {
     shadows: true,
     rain: false,
     blobRadius: 4,
-    exposure: 1,
-    bloomStrength: 1.5,
+    // Lighting
+    ambientLightIntensity: 0.6,
+    dirLightIntensity: 0.6,
+    // Bloom
+    bloomStrength: 0.75,
     bloomRadius: 0,
     bloomThreshold: 0,
+    bloomAmbientLightIntensity: 0.3,
+    bloomDirLightIntensity: 0,
   }
   const gui = new GUI()
   gui.domElement.style = 'font-size: 1em'
@@ -54,6 +59,11 @@ export function setupGUI(cityscape) {
   gui.add(parameters, 'rain')
 
   // Lighting parameters
+  const lightParametersFolder = gui.addFolder('Light Parameters')
+  lightParametersFolder.add(parameters, 'ambientLightIntensity', 0, 2)
+  lightParametersFolder.add(parameters, 'dirLightIntensity', 0, 2)
+
+  // Bloom parameters
   const bloomParametersFolder = gui.addFolder('Bloom Parameters')
   bloomParametersFolder.add(parameters, 'bloomStrength', 0, 3).onChange((v) => {
     cityscape.bloomComposer.passes[1].strength = v
@@ -64,6 +74,8 @@ export function setupGUI(cityscape) {
   bloomParametersFolder.add(parameters, 'bloomThreshold', 0, 2).onChange((v) => {
     cityscape.bloomComposer.passes[1].threshold = v
   })
+  bloomParametersFolder.add(parameters, 'bloomAmbientLightIntensity', 0, 2)
+  bloomParametersFolder.add(parameters, 'bloomDirLightIntensity', 0, 2)
 
   // Finish
   cityscape.params = parameters

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { OrthographicCamera } from 'three'
+import { darkMaterial } from './config'
 
 let ambientLight, dirLight, currTime
 let planeMesh, planeMaterial
@@ -7,14 +7,13 @@ let planeMesh, planeMaterial
 // Init function
 export function setupLighting(cityscape) {
   // Ambient light
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.25) // todo: factor out
+  ambientLight = new THREE.AmbientLight(0xffffff, cityscape.params.ambientLightIntensity)
   ambientLight.layers.enable(0)
   ambientLight.layers.enable(1)
   cityscape.scene.add(ambientLight)
 
   // Directional light
-  dirLight = new THREE.DirectionalLight(0xffffff, 0.15) // todo: factor out
-  dirLight.position.set(-1, 1, -1) // related todo: movement
+  dirLight = new THREE.DirectionalLight(0xffffff, cityscape.params.dirLightIntensity)
   dirLight.layers.enable(0)
   dirLight.layers.enable(1)
   cityscape.scene.add(dirLight)
@@ -23,7 +22,7 @@ export function setupLighting(cityscape) {
   dirLight.castShadow = true
   prevBlobRadius = cityscape.params.blobRadius
   const r = cityscape.params.blobRadius * 1.5
-  dirLight.shadow.camera = new OrthographicCamera(-r, r, r, -r, -10, 10)
+  dirLight.shadow.camera = new THREE.OrthographicCamera(-r, r, r, -r, -10, 10)
   const dim = r * 100
   dirLight.shadow.mapSize = new THREE.Vector2(dim, dim)
   dirLight.shadow.bias = -0.0001
@@ -79,9 +78,13 @@ export function updateLighting(cityscape) {
 }
 
 // Helper function
-export function darkenPlane(darkMaterial) {
+export function enableBloomModeLighting(cityscape) {
   planeMesh.material = darkMaterial
+  ambientLight.intensity = cityscape.params.bloomAmbientLightIntensity
+  dirLight.intensity = cityscape.params.bloomDirLightIntensity
 }
-export function unDarkenPlane() {
+export function disableBloomModeLighting(cityscape) {
   planeMesh.material = planeMaterial
+  ambientLight.intensity = cityscape.params.ambientLightIntensity
+  dirLight.intensity = cityscape.params.dirLightIntensity
 }
