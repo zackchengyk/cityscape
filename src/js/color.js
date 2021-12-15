@@ -16,7 +16,7 @@ export const COLOR_BASE = 0.05
 
 export function getBase(x, y, seed) {
   const noise = new Noise(Math.random())
-  const noiseFrequency = 0.05
+  const noiseFrequency = 0.01
   noise.seed(seed)
   return (noise.simplex2(x * noiseFrequency, y * noiseFrequency) + 1) / 2
 }
