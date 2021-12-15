@@ -20,6 +20,14 @@ export function animate(cityscape, currTime) {
   if (cityscape.params.autorun) {
     cityscape.params.timeOfDay += deltaTime / 250
     cityscape.params.timeOfDay = cityscape.params.timeOfDay % 24
+    // Update display
+    cityscape.gui.children.forEach((x) => {
+      if (x.children) {
+        x.children.forEach((y) => y.updateDisplay())
+      } else {
+        x.updateDisplay()
+      }
+    })
   }
 
   // Update things

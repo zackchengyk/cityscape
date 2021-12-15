@@ -2,13 +2,6 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { MIN_ZOOM, MAX_ZOOM } from '/js/config'
 
-// Todo, @Jessie?
-// easy:   add more "simple" params, whose values are simply read by other things
-// medium: add more "medium" params, which require simple functions to be called when
-//           their values change (e.g. camera.zoom => must call camera.updateProjectionMatrix)
-// hard:   add "hard" params, which require very complex, possibly custom functions to be
-//           called (e.g. blob radius decreases => clean up unnecessary grid cells)
-
 export function setupGUI(cityscape) {
   // Start up
   const parameters = {
@@ -97,4 +90,5 @@ export function setupGUI(cityscape) {
   // Finish
   cityscape.params = parameters
   gui.open()
+  cityscape.gui = gui
 }
