@@ -54,11 +54,11 @@ export function getPrimaryAndSecondaryColorModified(x, y, s, l) {
 
   let primaryH = (base + noise * NOISE_RATIO) % 1
   primaryH = Math.round(primaryH * 20) / 20
-  const primaryColor = new THREE.Color(hsl2string(primaryH, s, l))
+  const primaryColor = new THREE.Color().setHSL(primaryH, s, l)
 
-  let secondaryH = (base + noise * NOISE_RATIO + PHI) % 1
+  let secondaryH = (base + noise * NOISE_RATIO + PHI / 2 / Math.PI) % 1
   secondaryH = Math.round(secondaryH * 20) / 20
-  const secondaryColor = new THREE.Color(hsl2string(secondaryH, s, l))
+  const secondaryColor = new THREE.Color().setHSL(secondaryH, s, l)
 
   return [primaryColor, secondaryColor]
 }
