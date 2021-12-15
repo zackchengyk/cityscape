@@ -99,6 +99,20 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     outlineMesh2,
     windowGroup,
   })
+  boxMesh.callback = () => {
+    addToGridCellMap({
+      type: 'box',
+      worldX,
+      worldZ,
+      isGlowing: true,
+      actualHeight,
+      boxMesh,
+      outlineMesh1,
+      outlineMesh2,
+      windowGroup,
+    })
+    console.log('Yeehaw')
+  }
   addToScene(boxMesh)
   boxMesh.layers.enable(0)
   boxMesh.layers.enable(1)
