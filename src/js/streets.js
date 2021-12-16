@@ -53,7 +53,7 @@ function generateCar(scene, x, z, dir) {
 
   const body = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
-    new THREE.MeshPhongMaterial({ color: '#ff0000' })
+    new THREE.MeshLambertMaterial({ color: '#ff0000' })
   )
   body.scale.set(0.25, 0.05, 0.15)
   body.position.set(0, 0.025, 0)
@@ -63,7 +63,7 @@ function generateCar(scene, x, z, dir) {
 
   const hood = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
-    new THREE.MeshPhongMaterial({ color: '#ffffff' })
+    new THREE.MeshLambertMaterial({ color: '#ffffff' })
   )
   hood.scale.set(0.15, 0.08, 0.11)
   hood.position.set(0 + 0.03, 0.06, 0)
@@ -73,7 +73,7 @@ function generateCar(scene, x, z, dir) {
 
   const fwheels = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
-    new THREE.MeshPhongMaterial({ color: '#333333' })
+    new THREE.MeshLambertMaterial({ color: '#333333' })
   )
   fwheels.scale.set(0.05, 0.05, 0.16)
   fwheels.position.set(0 - 0.055, 0.01, 0)
@@ -83,7 +83,7 @@ function generateCar(scene, x, z, dir) {
 
   const bwheels = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 1, 1, 1),
-    new THREE.MeshPhongMaterial({ color: '#333333' })
+    new THREE.MeshLambertMaterial({ color: '#333333' })
   )
   bwheels.scale.set(0.05, 0.05, 0.16)
   bwheels.position.set(0 + 0.055, 0.01, 0)
@@ -97,8 +97,8 @@ function generateCar(scene, x, z, dir) {
   // car.layers.enable(0)
   car.layers.set(1)
   car.traverse((child) => {
-    // child.layers.enable(0)
-    child.layers.set(1)
+    child.layers.enable(0)
+    child.layers.enable(1)
   })
   scene.add(car)
   let worldPos = car.position.clone()
