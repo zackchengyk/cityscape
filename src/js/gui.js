@@ -31,9 +31,9 @@ export function setupGUI(cityscape) {
     bloomDirLightIntensity: 0,
     // Weather
     rain: false,
-    windSpeed: 1 / 15,
+    windSpeed: 1 / 50,
     cloudSpawnProbability: 0.05,
-    cloudOpacity: 0.5,
+    cloudOpacity: 0.25,
   }
   const gui = new GUI()
   // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements
@@ -106,7 +106,7 @@ export function setupGUI(cityscape) {
   // Weather
   const weatherParametersFolder = gui.addFolder('Weather')
   weatherParametersFolder.add(parameters, 'rain')
-  weatherParametersFolder.add(parameters, 'windSpeed', 0, 1)
+  weatherParametersFolder.add(parameters, 'windSpeed', 0, 0.5)
   weatherParametersFolder.add(parameters, 'cloudSpawnProbability', 0, 0.2)
   weatherParametersFolder.add(parameters, 'cloudOpacity', 0, 1).onChange((v) => {
     cityscape.shaderComposer.removePass(cityscape.shaderComposer.passes[1])
