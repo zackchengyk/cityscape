@@ -117,13 +117,13 @@ const windowGeometry = new THREE.PlaneGeometry(0.065, 0.07, 1, 1)
 const windowMaterial = new THREE.MeshLambertMaterial({
   emissive: 0x777777,
 })
-const maxWindowNum = 6
+const maxWindowNum = 5
 const largeWindowGeometry = new THREE.PlaneGeometry(0.65, 0.07, 1, 1)
 
 // Helper
 function generateWindowGroup(actualHeight, actualWidth) {
   const numberOfFloors = Math.floor(actualHeight / heightPerFloor)
-  const windowsPerFloor = THREE.MathUtils.randInt(3, 10) // Todo? make this deterministic, and a nicer distribution
+  const windowsPerFloor = THREE.MathUtils.randInt(3, 8) // Todo? make this deterministic, and a nicer distribution
   const halfHeight = actualHeight / 2
   const halfWidth = actualWidth / 2
   const windowsPerFloorMinusOne = windowsPerFloor - 1
