@@ -284,10 +284,6 @@ export function updateClouds(cityscape) {
 
     const x = obj.cloud.position.x
     const z = obj.cloud.position.z
-    /*
-    const opacity = Math.min(0.3, Math.max(0.1, (x+radius)*(z+radius)/diameter/diameter))
-    obj.cloud.material.opacity = opacity
-    */
   })
 
   const elementsToDelete = []
@@ -308,9 +304,9 @@ export function updateClouds(cityscape) {
   // Add clouds to the edge
   const roundedFocusX = Math.round(focus.x)
   const roundedFocusZ = Math.round(focus.z)
-  if (Math.random() > cityscape.params.cloudSpawnProbability) return
   for (let distx = 0; distx <= BOUND_X; distx += cubeSize) {
-    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z + 2; worldz += cubeSize) {
+    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z+2; worldz += cubeSize) {
+      if (Math.random() > cityscape.params.cloudSpawnProbability) continue;
       if (Math.random() < cityscape.params.cloudSpawnProbability) {
         addCloud(cityscape.scene, roundedFocusX + BOUND_X - distx, worldz, true)
       }
