@@ -257,7 +257,7 @@ export function updateRain(cityscape) {
 
 function cloudWithinBoundsRelative(relativeX, relativeZ) {
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  return BLOB_RADIUS_SQUARED + 10 > distanceSquared
+  return BLOB_RADIUS_SQUARED + 5 > distanceSquared
 }
 
 export function updateClouds(cityscape) {
@@ -304,7 +304,7 @@ export function updateClouds(cityscape) {
   const roundedFocusZ = Math.round(focus.z)
   if (Math.random() > cityscape.params.cloudSpawnProbability) return
   for (let distx = 0; distx <= BOUND_X; distx += cubeSize) {
-    for (let worldz = roundedFocusZ - BOUND_Z - 1; worldz < roundedFocusZ - BOUND_Z; worldz += cubeSize) {
+    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z+2; worldz += cubeSize) {
       if (Math.random() < cityscape.params.cloudSpawnProbability) {
 	addCloud(cityscape.scene, roundedFocusX+BOUND_X-distx, worldz, true)
       }
