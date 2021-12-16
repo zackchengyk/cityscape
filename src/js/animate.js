@@ -32,6 +32,9 @@ export function animate(cityscape, currTime) {
   updateRain(cityscape)
   updateClouds(cityscape)
 
+  // Render clouds to texture
+  renderCloudToTexture(cityscape)
+
   // Render bloom to texture
   renderBloomToTexture(cityscape)
 
@@ -48,6 +51,23 @@ export function animate(cityscape, currTime) {
   })
 
   cityscape.stats.end()
+}
+
+// Animate helper
+function renderCloudToTexture(cityscape) {
+  // Go to layer with clouds
+  cityscape.camera.layers.set(3)
+
+  // Temporarily swap out clear color
+  let tempRendererClearColor = new THREE.Color()
+  cityscape.renderer.getClearColor(tempRendererClearColor)
+  cityscape.renderer.setClearColor('black') // Do not interfere with clouds
+
+  // Render
+  cityscape.cloudComposer.render()
+
+  // Revert clear color
+  cityscape.renderer.setClearColor(tempRendererClearColor)
 }
 
 // Animate helper

@@ -10,6 +10,7 @@ const cityscape = {
   camera: undefined,
   scene: undefined,
   renderer: undefined,
+  cloudComposer: undefined,
   bloomComposer: undefined,
   shaderComposer: undefined,
   orbitControls: undefined,

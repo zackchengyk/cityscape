@@ -17,7 +17,7 @@ let diameter
 let radius
 const xvel = 0
 const yvel = -0.2
-const zvel = 0.1
+const zvel = 1
 const bufferTime = 20
 const cloudThreshold = 0.5
 const cubeSize = 0.25
@@ -29,37 +29,45 @@ noise.seed(Math.random())
 
 const cloudSize = 10
 
-const adj = [[cubeSize, 0], [0, cubeSize], [0, -cubeSize], [-cubeSize, 0]]
+const adj = [
+  [cubeSize, 0],
+  [0, cubeSize],
+  [0, -cubeSize],
+  [-cubeSize, 0],
+]
 
 function getRandomPos() {
   return Math.random() * diameter - radius
 }
 
 function cloudFloodFill(x, z) {
-  let minX = 0, maxX = 0, minZ = 0, maxZ = 0
+  let minX = 0,
+    maxX = 0,
+    minZ = 0,
+    maxZ = 0
   let geometry = null
   let positions = new Set()
   let visited = new Set()
   let queue = []
-  queue.push({dx: 0, dz: 0})
+  queue.push({ dx: 0, dz: 0 })
   while (queue.length > 0) {
-    let {dx, dz} = queue[0]
+    let { dx, dz } = queue[0]
     minX = Math.min(minX, dx)
     maxX = Math.max(maxX, dx)
     minZ = Math.min(minZ, dz)
     maxZ = Math.max(maxZ, dz)
     queue.shift()
-    visited.add(xzToKey(x+dx, z+dz))
-    const perlinVal = noise.simplex2((x+dx).toFixed(2)/2, (z+dz).toFixed(2)/2)
+    visited.add(xzToKey(x + dx, z + dz))
+    const perlinVal = noise.simplex2((x + dx).toFixed(2) / 2, (z + dz).toFixed(2) / 2)
     if (Math.abs(perlinVal) < cloudThreshold) continue
-    positions.add(xzToKey(x+dx, z+dz))
+    positions.add(xzToKey(x + dx, z + dz))
     for (let k = 0; k < 4; k++) {
       const nx = dx + adj[k][0]
       const nz = dz + adj[k][1]
-      const key = xzToKey(x+nx, z+nz)
+      const key = xzToKey(x + nx, z + nz)
       if (visited.has(key)) continue
       visited.add(key)
-      queue.push({dx: nx, dz: nz})
+      queue.push({ dx: nx, dz: nz })
     }
   }
 
@@ -100,20 +108,20 @@ export function setupRain(cityscape) {
 export function addCloudBlock(scene, worldX, worldZ) {
   for (let x = worldX; x < worldX + 1; x += cubeSize) {
     for (let z = worldZ; z < worldZ + 1; z += cubeSize) {
-      if (addCloud(scene, x, z, false))
-	return
+      if (addCloud(scene, x, z, false)) return
     }
   }
 }
 
 function addCloud(scene, worldX, worldZ, jitter) {
   if (cloudPositions.has(xzToKey(worldX, worldZ))) return
-  if (!cloudWithinBoundsRelative(worldX-focus.x, worldZ-focus.z)) return
+  if (!cloudWithinBoundsRelative(worldX - focus.x, worldZ - focus.z)) return
   if (Clouds.size >= maxClouds) return
-  let x = worldX, z = worldZ
+  let x = worldX,
+    z = worldZ
   if (jitter) {
-    x += Math.round(Math.random()*1000) + 1000
-    z += Math.round(Math.random()*1000) + 1000
+    x += Math.round(Math.random() * 1000) + 1000
+    z += Math.round(Math.random() * 1000) + 1000
   }
   let { positions, visited, minX, maxX, minZ, maxZ } = cloudFloodFill(x, z)
   if (positions.size == 0) return false
@@ -121,15 +129,14 @@ function addCloud(scene, worldX, worldZ, jitter) {
 
   for (let cubex = minX; cubex <= maxX; cubex += cubeSize) {
     for (let cubez = minZ; cubez <= maxZ; cubez += cubeSize) {
-      if (!positions.has(xzToKey(x+cubex, z+cubez))) continue
+      if (!positions.has(xzToKey(x + cubex, z + cubez))) continue
       let box = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
       box.translate(cubex, 0, cubez)
       box.rotateY(Math.PI)
       if (geometry == null) {
-	geometry = box
-      }
-      else {
-	geometry = mergeBufferGeometries([geometry, box])
+        geometry = box
+      } else {
+        geometry = mergeBufferGeometries([geometry, box])
       }
     }
   }
@@ -139,20 +146,20 @@ function addCloud(scene, worldX, worldZ, jitter) {
     new THREE.MeshPhongMaterial({
       emissive: '#ffffff',
       emissiveIntensity: 0.17,
-      transparent: true,
-      opacity: 0.5,
     })
   )
   cloud.position.set(worldX, Math.random() * 2 + 3, worldZ)
   cloud.castShadow = false
   cloud.receiveShadow = false
   let worldPos = cloud.position.clone()
-  Clouds.add({cloud: cloud, _worldPosition: worldPos, positions: positions})
-  
-  cloud.layers.enable(0)
-  cloud.layers.enable(1)
+  Clouds.add({ cloud: cloud, _worldPosition: worldPos, positions: positions })
+
+  cloud.layers.set(3)
+  // cloud.layers.enable(1)
   scene.add(cloud)
-  positions.forEach((key) => { cloudPositions.add(key)})
+  positions.forEach((key) => {
+    cloudPositions.add(key)
+  })
   return true
 }
 
@@ -272,14 +279,13 @@ export function updateClouds(cityscape) {
 
   const elementsToDelete = []
   Clouds.forEach((obj) => {
-    if (!cloudWithinBoundsRelative(obj.cloud.position.x,
-				   obj.cloud.position.z)) {
+    if (!cloudWithinBoundsRelative(obj.cloud.position.x, obj.cloud.position.z)) {
       cityscape.scene.remove(obj.cloud)
       obj.cloud.geometry.dispose()
       obj.cloud.material.dispose()
       elementsToDelete.push(obj)
       obj.positions.forEach((key) => {
-	cloudPositions.delete(key)
+        cloudPositions.delete(key)
       })
     }
   })

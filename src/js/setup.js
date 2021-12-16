@@ -25,20 +25,23 @@ const vertexShader = `
 `
 const fragmentShader = `
   uniform int renderType;
-  uniform sampler2D boxesTexture;
+  uniform float cloudOpacity;
+  uniform sampler2D cloudTexture;
   uniform sampler2D bloomTexture;
+  uniform sampler2D boxesTexture;
   varying vec2 vUv;
   void main() {
-    vec4 boxesColor = texture2D( boxesTexture, vUv );
+    vec4 cloudColor = texture2D( cloudTexture, vUv );
     vec4 bloomColor = texture2D( bloomTexture, vUv );
+    vec4 boxesColor = texture2D( boxesTexture, vUv );
 
     switch (renderType) {
       // Bloom + scene
       case 0: {
         if (boxesColor.x < 0.005 && boxesColor.y < 0.005 && boxesColor.z < 0.005) {
-          gl_FragColor = boxesColor + 0.2 * bloomColor;
+          gl_FragColor = boxesColor + 0.2 * bloomColor + 0.5 * cloudOpacity * cloudColor;
         } else {
-          gl_FragColor = boxesColor + bloomColor;
+          gl_FragColor = boxesColor + bloomColor + cloudOpacity * cloudColor;
         }
         return;
       }
@@ -47,9 +50,14 @@ const fragmentShader = `
         gl_FragColor = bloomColor;
         return;
       }
-      // No bloom (scene only)
+      // Scene only
       case 2: {
         gl_FragColor = boxesColor;
+        return;
+      }
+      // Clouds only
+      case 3: {
+        gl_FragColor = cloudColor;
         return;
       }
     }
@@ -123,6 +131,12 @@ function setupCameraSceneRendererComposer(cityscape) {
     cityscape.params.bloomThreshold
   )
 
+  // Cloud composer (A)
+  cityscape.cloudComposer = new EffectComposer(cityscape.renderer)
+  cityscape.cloudComposer.renderToScreen = false // will render to cityscape.cloudComposer.renderTarget2.texture
+  cityscape.cloudComposer.addPass(renderPass)
+  cityscape.cloudComposer.addPass(unrealBloomPass)
+
   // Bloom composer (A + B)
   cityscape.bloomComposer = new EffectComposer(cityscape.renderer)
   cityscape.bloomComposer.renderToScreen = false // will render to cityscape.bloomComposer.renderTarget2.texture
@@ -130,20 +144,9 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.bloomComposer.addPass(unrealBloomPass)
 
   // C. Shader pass
-  const shaderPass = new ShaderPass(
-    new THREE.ShaderMaterial({
-      uniforms: {
-        renderType: { value: 0 },
-        boxesTexture: { value: null },
-        bloomTexture: { value: cityscape.bloomComposer.renderTarget2.texture },
-      },
-      vertexShader,
-      fragmentShader,
-    }),
-    'boxesTexture' // texture from its own earlier passes
-  )
+  const shaderPass = makeNewShaderPass(cityscape)
 
-  // Shader composer (A + C, dependent on A + B)
+  // Shader composer (A + C, dependent on cloud and bloom composers)
   cityscape.shaderComposer = new EffectComposer(cityscape.renderer)
   cityscape.shaderComposer.addPass(renderPass)
   cityscape.shaderComposer.addPass(shaderPass)
@@ -160,4 +163,23 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.orbitControls.autoRotate = false
   cityscape.orbitControls.autoRotateSpeed = 2
   cityscape.orbitControls.enablePan = false
+}
+
+// Shader pass creator
+export function makeNewShaderPass(cityscape, uniformModifications) {
+  return new ShaderPass(
+    new THREE.ShaderMaterial({
+      uniforms: {
+        renderType: { value: 0 },
+        cloudOpacity: { value: cityscape.params.cloudOpacity },
+        cloudTexture: { value: cityscape.cloudComposer.renderTarget2.texture },
+        bloomTexture: { value: cityscape.bloomComposer.renderTarget2.texture },
+        boxesTexture: { value: null }, // texture from its own earlier passes
+        ...uniformModifications,
+      },
+      vertexShader,
+      fragmentShader,
+    }),
+    'boxesTexture' // texture from its own earlier passes
+  )
 }

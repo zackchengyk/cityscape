@@ -1,7 +1,7 @@
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { MIN_ZOOM, MAX_ZOOM } from '/js/config'
 import { setMaxSpeed } from '/js/movement'
+import { makeNewShaderPass } from '/js/setup'
 
 export function setupGUI(cityscape) {
   // Start up
@@ -10,7 +10,6 @@ export function setupGUI(cityscape) {
     scene: 'Bloom + Scene',
     timeOfDay: 12,
     shadows: true,
-    rain: false,
     // Blob
     blobRadius: 4,
     maxSpeed: 0.075,
@@ -31,16 +30,17 @@ export function setupGUI(cityscape) {
     bloomAmbientLightIntensity: 0,
     bloomDirLightIntensity: 0,
     // Weather
-    windSpeed: 1/15,
+    rain: false,
+    windSpeed: 1 / 15,
     cloudSpawnProbability: 0.05,
+    cloudOpacity: 0.5,
   }
   const gui = new GUI()
   // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements
 
   // Unorganized parameters
   gui.add(parameters, 'autorun')
-  gui.add(parameters, 'scene', ['Bloom + Scene', 'Bloom only', 'Scene only']).onChange((v) => {
-    const existingShaderMaterial = cityscape.shaderComposer.passes[1].material.clone()
+  gui.add(parameters, 'scene', ['Bloom + Scene', 'Bloom only', 'Scene only', 'Cloud only']).onChange((v) => {
     let newRenderType = 0
     switch (v) {
       case 'Bloom only': {
@@ -51,20 +51,18 @@ export function setupGUI(cityscape) {
         newRenderType = 2
         break
       }
-    }
-    existingShaderMaterial.uniforms = {
-      renderType: { value: newRenderType },
-      boxesTexture: { value: null },
-      bloomTexture: { value: cityscape.bloomComposer.renderTarget2.texture },
+      case 'Cloud only': {
+        newRenderType = 3
+        break
+      }
     }
     cityscape.shaderComposer.removePass(cityscape.shaderComposer.passes[1])
-    cityscape.shaderComposer.addPass(new ShaderPass(existingShaderMaterial, 'boxesTexture'))
+    cityscape.shaderComposer.addPass(makeNewShaderPass(cityscape, { renderType: { value: newRenderType } }))
   })
 
   // Unorganized parameters
   gui.add(parameters, 'timeOfDay', 0, 24)
   gui.add(parameters, 'shadows')
-  gui.add(parameters, 'rain')
 
   // Blob
   const blobParametersFolder = gui.addFolder('Blob')
@@ -107,8 +105,13 @@ export function setupGUI(cityscape) {
 
   // Weather
   const weatherParametersFolder = gui.addFolder('Weather')
+  weatherParametersFolder.add(parameters, 'rain')
   weatherParametersFolder.add(parameters, 'windSpeed', 0, 1)
   weatherParametersFolder.add(parameters, 'cloudSpawnProbability', 0, 0.2)
+  weatherParametersFolder.add(parameters, 'cloudOpacity', 0, 1).onChange((v) => {
+    cityscape.shaderComposer.removePass(cityscape.shaderComposer.passes[1])
+    cityscape.shaderComposer.addPass(makeNewShaderPass(cityscape, { cloudOpacity: { value: v } }))
+  })
 
   // Finish
   cityscape.params = parameters
