@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { clearBox, updateBox, fillWithBox, enableBloomModeBox, disableBloomModeBox } from '/js/box'
 import { focus, getSpeed } from '/js/movement'
 import { generateStreets, isStreetPosition } from '/js/streets'
+import { addCloudBlock } from '/js/weather'
 
 // Important
 const gridCellMap = new Map()
@@ -149,6 +150,7 @@ function updateGridCell(gridCellValue, scale) {
 
 // Helpers for updateGrid
 function fillGridCell(scene, worldX, worldZ, scale, gridCellKey) {
+  addCloudBlock(scene, worldX, worldZ)
   const type = isStreetPosition(worldX, worldZ) ? 'street' : 'box'
 
   switch (type) {

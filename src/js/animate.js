@@ -3,7 +3,7 @@ import { updateGrid, enableBloomModeGrid, disableBloomModeGrid } from '/js/grid'
 import { updateEntities } from '/js/streets'
 import { updateLighting, enableBloomModeLighting, disableBloomModeLighting } from '/js/lighting'
 import { updateMovement } from '/js/movement'
-import { updateRain } from '/js/weather'
+import { updateRain, updateClouds } from '/js/weather'
 
 let prevTime = 0
 
@@ -30,6 +30,7 @@ export function animate(cityscape, currTime) {
   updateEntities(cityscape)
   updateLighting(cityscape)
   updateRain(cityscape)
+  updateClouds(cityscape)
 
   // Render bloom to texture
   renderBloomToTexture(cityscape)
