@@ -69,6 +69,7 @@ export function setupGUI(cityscape) {
   const blobParametersFolder = gui.addFolder('Blob')
   blobParametersFolder.add(parameters, 'blobRadius', 0, 12).step(1)
   blobParametersFolder.add(parameters, 'maxSpeed', 0.025, 1).onChange((v) => setMaxSpeed(v))
+  blobParametersFolder.close()
 
   // Camera / renderer parameters
   const cameraParametersFolder = gui.addFolder('Camera / Renderer')
@@ -76,13 +77,14 @@ export function setupGUI(cityscape) {
     cityscape.renderer.toneMappingExposure = v
   })
   cameraParametersFolder.add(parameters, 'zoom', MIN_ZOOM, MAX_ZOOM)
+  cameraParametersFolder.add(parameters, 'autoMove')
   cameraParametersFolder.add(parameters, 'autoRotate').onChange((v) => {
     cityscape.orbitControls.autoRotate = v
   })
   cameraParametersFolder.add(parameters, 'autoRotateSpeed', 0, 20).onChange((v) => {
     cityscape.orbitControls.autoRotateSpeed = v
   })
-  cameraParametersFolder.add(parameters, 'autoMove')
+  cameraParametersFolder.close()
 
   // Lighting parameters
   const lightParametersFolder = gui.addFolder('Lighting')
@@ -92,6 +94,7 @@ export function setupGUI(cityscape) {
   lightParametersFolder.add(parameters, 'bloomWindowEmissivity', 0, 2)
   lightParametersFolder.add(parameters, 'bloomAmbientLightIntensity', 0, 2)
   lightParametersFolder.add(parameters, 'bloomDirLightIntensity', 0, 2)
+  lightParametersFolder.close()
 
   // Bloom parameters
   const bloomParametersFolder = gui.addFolder('Bloom')
@@ -104,6 +107,7 @@ export function setupGUI(cityscape) {
   bloomParametersFolder.add(parameters, 'bloomThreshold', 0, 2).onChange((v) => {
     cityscape.bloomComposer.passes[1].threshold = v
   })
+  bloomParametersFolder.close()
 
   // Weather
   const weatherParametersFolder = gui.addFolder('Weather')
@@ -123,9 +127,10 @@ export function setupGUI(cityscape) {
       cityscape.cloudComposer.removePass(tempPass)
     }
   })
+  weatherParametersFolder.close()
 
   // Finish
   cityscape.params = parameters
-  gui.open()
+  gui.close()
   cityscape.gui = gui
 }
