@@ -26,10 +26,10 @@ export function setupGUI(cityscape) {
     // Bloom
     bloomStrength: 1.5,
     bloomRadius: 0,
-    bloomThreshold: 0,
+    bloomThreshold: 0.075,
     bloomWindowEmissivity: 0,
-    bloomAmbientLightIntensity: 0.2,
-    bloomDirLightIntensity: 0.2,
+    bloomAmbientLightIntensity: 0,
+    bloomDirLightIntensity: 0,
   }
   const gui = new GUI()
   // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements

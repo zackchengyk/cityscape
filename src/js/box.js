@@ -67,7 +67,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   const boxMaterial = new THREE.MeshPhongMaterial({
     color: pc,
     specular: sc,
-    shininess: 40,
+    shininess: 30,
     ...boxMaterialBaseParameters,
   })
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial)
@@ -125,8 +125,7 @@ const offsetFromGround = 1 / 8
 const offsetFromSide = 1 / 8
 const windowGeometry = new THREE.PlaneGeometry(0.065, 0.07, 1, 1)
 const windowMaterial = new THREE.MeshLambertMaterial({
-  emissive: 0xffffff,
-  emissiveIntensity: 0.2,
+  emissive: 0x777777,
 })
 const maxWindowNum = 6
 const largeWindowGeometry = new THREE.PlaneGeometry(0.65, 0.07, 1, 1)
