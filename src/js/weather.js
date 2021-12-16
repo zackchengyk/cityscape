@@ -26,10 +26,11 @@ export function setupRain(cityscape) {
     color: 0xcccccc,
     size: 1.5,
     transparent: true,
-    opacity: 0.5
+    opacity: 0.5,
   })
 
   rain = new THREE.Points(geometry, material)
+  rain.layers.enable(1)
   cityscape.scene.add(rain)
 }
 
@@ -41,16 +42,16 @@ export function updateRain(cityscape) {
   const positions = rain.geometry.attributes.position.array
   let visibleRain = false
   for (let i = 0; i < positions.length; i += 3) {
-    if (cityscape.params.rain == false && positions[i+1] < -0.2) {
+    if (cityscape.params.rain == false && positions[i + 1] < -0.2) {
       continue
     }
     visibleRain = true
     let nx = positions[i] + xvel
-    let ny = positions[i+1] + yvel
-    let nz = positions[i+2] + zvel
+    let ny = positions[i + 1] + yvel
+    let nz = positions[i + 2] + zvel
     if (ny < -0.2) {
-      if (cityscape.params.rain == true || Math.random() > 2/bufferTime) {
-	ny = Math.random() * radius + radius
+      if (cityscape.params.rain == true || Math.random() > 2 / bufferTime) {
+        ny = Math.random() * radius + radius
       }
       nx = Math.random() * diameter - radius
       nz = Math.random() * diameter - radius
@@ -68,8 +69,8 @@ export function updateRain(cityscape) {
       nz += diameter
     }
     positions[i] = nx
-    positions[i+1] = ny
-    positions[i+2] = nz
+    positions[i + 1] = ny
+    positions[i + 2] = nz
   }
   rain.geometry.attributes.position.needsUpdate = true
   if (cityscape.params.rain == false && visibleRain == false) {
