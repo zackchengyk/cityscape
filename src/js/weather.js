@@ -218,9 +218,9 @@ export function updateRain(cityscape) {
       continue
     }
     visibleRain = true
-    let nx = positions[i] + xvel
+    let nx = positions[i] + xvel*cityscape.params.windSpeed
     let ny = positions[i + 1] + yvel
-    let nz = positions[i + 2] + zvel
+    let nz = positions[i + 2] + zvel*cityscape.params.windSpeed
     if (ny < -0.2) {
       if (cityscape.params.rain == true || Math.random() > 2 / bufferTime) {
         ny = Math.random() * radius + radius
