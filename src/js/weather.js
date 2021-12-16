@@ -9,6 +9,7 @@ let BLOB_RADIUS_SQUARED
 let BOUND_X
 let BOUND_Z
 
+let cloudProbability = 0
 let maxClouds = 40
 let rain = null
 let Clouds = new Set()
@@ -108,7 +109,9 @@ export function setupRain(cityscape) {
 export function addCloudBlock(scene, worldX, worldZ) {
   for (let x = worldX; x < worldX + 1; x += cubeSize) {
     for (let z = worldZ; z < worldZ + 1; z += cubeSize) {
-      if (addCloud(scene, x, z, false)) return
+      if (Math.random() < cloudProbability) {
+	addCloud(scene, x, z, false)
+      }
     }
   }
 }
@@ -172,6 +175,7 @@ function xzToKey(x, z) {
 }
 
 export function setupClouds(cityscape) {
+  cloudProbability = cityscape.params.cloudSpawnProbability
   BLOB_RADIUS = cityscape.params.blobRadius
   BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
   BOUND_X = BLOB_RADIUS
@@ -258,6 +262,7 @@ export function updateClouds(cityscape) {
   let cloudVelocity = new THREE.Vector3(xvel*cityscape.params.windSpeed,
 					0,
 					zvel*cityscape.params.windSpeed)
+  cloudProbability = cityscape.params.cloudSpawnProbability
   BLOB_RADIUS = cityscape.params.blobRadius
   BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
   BOUND_X = BLOB_RADIUS
