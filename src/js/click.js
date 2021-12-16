@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 
 const raycaster = new THREE.Raycaster()
 const mouse = new THREE.Vector2()

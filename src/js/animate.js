@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 import { updateGrid, enableBloomModeGrid, disableBloomModeGrid } from '/js/grid'
 import { updateEntities } from '/js/streets'
 import { updateLighting, enableBloomModeLighting, disableBloomModeLighting } from '/js/lighting'

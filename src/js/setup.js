@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 import { CAMERA_POSITION, NEAR_PLANE, FAR_PLANE, MIN_ZOOM, MAX_ZOOM } from '/js/config'
 import { setupGrid } from '/js/grid'
 import { setupGUI } from '/js/gui'

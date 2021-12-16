@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 import { darkMaterial, LIGHT_NEAR_PLANE, LIGHT_FAR_PLANE } from '/js/config'
 
 let ambientLight, dirLight

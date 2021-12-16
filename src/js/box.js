@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 import { getNoise, getPrimaryAndSecondaryColorModified, HEIGHT_SEED } from '/js/color'
 import { darkMaterial } from '/js/config'
 import { focus } from '/js/movement'

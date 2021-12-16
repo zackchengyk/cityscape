@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 import { mergeBufferGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { focus, getSpeed } from '/js/movement'
 import { rainDensity } from '/js/config'
@@ -83,11 +83,7 @@ export function setupRain(cityscape) {
   if (cityscape.params.rain == false) return
   const droplets = []
   for (let i = 0; i < rainDensity; i++) {
-    const droplet = new THREE.Vector3(
-      getRandomPos(),
-      -0.2,
-      getRandomPos()
-    )
+    const droplet = new THREE.Vector3(getRandomPos(), -0.2, getRandomPos())
     droplets.push(droplet)
   }
   let geometry = new THREE.BufferGeometry().setFromPoints(droplets)
@@ -224,9 +220,9 @@ export function updateRain(cityscape) {
       continue
     }
     visibleRain = true
-    rainPositions[i].x += xvel*cityscape.params.windSpeed
+    rainPositions[i].x += xvel * cityscape.params.windSpeed
     rainPositions[i].y += yvel
-    rainPositions[i].z += zvelRain*cityscape.params.windSpeed
+    rainPositions[i].z += zvelRain * cityscape.params.windSpeed
     if (rainPositions[i].y < -0.2) {
       if (Math.random() < 1 / bufferTime) {
         rainPositions[i].y = Math.min(4.5, Math.random() * radius + radius)
@@ -246,9 +242,9 @@ export function updateRain(cityscape) {
     if (rainPositions[i].z - focus.z < -radius) {
       rainPositions[i].z += diameter
     }
-    positions[i*3] = rainPositions[i].x - focus.x
-    positions[i*3 + 1] = rainPositions[i].y
-    positions[i*3 + 2] = rainPositions[i].z - focus.z
+    positions[i * 3] = rainPositions[i].x - focus.x
+    positions[i * 3 + 1] = rainPositions[i].y
+    positions[i * 3 + 2] = rainPositions[i].z - focus.z
   }
   rain.geometry.attributes.position.needsUpdate = true
   if (cityscape.params.rain == false && visibleRain == false) {
@@ -305,8 +301,8 @@ export function updateClouds(cityscape) {
   const roundedFocusX = Math.round(focus.x)
   const roundedFocusZ = Math.round(focus.z)
   for (let distx = 0; distx <= BOUND_X; distx += cubeSize) {
-    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z+2; worldz += cubeSize) {
-      if (Math.random() > cityscape.params.cloudSpawnProbability) continue;
+    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z + 2; worldz += cubeSize) {
+      if (Math.random() > cityscape.params.cloudSpawnProbability) continue
       if (Math.random() < cityscape.params.cloudSpawnProbability) {
         addCloud(cityscape.scene, roundedFocusX + BOUND_X - distx, worldz, true)
       }

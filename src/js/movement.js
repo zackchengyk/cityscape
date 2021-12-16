@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import * as THREE from '../../node_modules/three/src/Three'
 
 const zeroVec3 = () => new THREE.Vector3(0, 0, 0)
 
