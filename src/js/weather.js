@@ -10,7 +10,6 @@ let BOUND_X
 let BOUND_Z
 
 let maxClouds = 40
-const cloudProbability = 0.05
 let rain = null
 let Clouds = new Set()
 let cloudPositions = new Set()
@@ -20,7 +19,6 @@ const xvel = 0
 const yvel = -0.2
 const zvel = 0.1
 const bufferTime = 20
-let cloudVelocity = new THREE.Vector3(xvel/15, 0, zvel/15)
 const cloudThreshold = 0.5
 const cubeSize = 0.25
 let cloudShiftX = 0
@@ -109,7 +107,6 @@ export function addCloudBlock(scene, worldX, worldZ) {
 }
 
 function addCloud(scene, worldX, worldZ, jitter) {
-  console.log(Clouds.size)
   if (cloudPositions.has(xzToKey(worldX, worldZ))) return
   if (!cloudWithinBoundsRelative(worldX-focus.x, worldZ-focus.z)) return
   if (Clouds.size >= maxClouds) return
@@ -251,6 +248,9 @@ function cloudWithinBoundsRelative(relativeX, relativeZ) {
 }
 
 export function updateClouds(cityscape) {
+  let cloudVelocity = new THREE.Vector3(xvel*cityscape.params.windSpeed,
+					0,
+					zvel*cityscape.params.windSpeed)
   BLOB_RADIUS = cityscape.params.blobRadius
   BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
   BOUND_X = BLOB_RADIUS
@@ -289,12 +289,14 @@ export function updateClouds(cityscape) {
   // Add clouds to the edge
   const roundedFocusX = Math.round(focus.x)
   const roundedFocusZ = Math.round(focus.z)
-  if (Math.random() > cloudProbability) return
-  for (let worldx = roundedFocusX - BOUND_X; worldx <= roundedFocusX + BOUND_X; worldx += cubeSize) {
+  if (Math.random() > cityscape.params.cloudSpawnProbability) return
+  for (let distx = 0; distx <= BOUND_X; distx += cubeSize) {
     for (let worldz = roundedFocusZ - BOUND_Z - 1; worldz < roundedFocusZ - BOUND_Z; worldz += cubeSize) {
-      if (Math.random() < cloudProbability) {
-	console.log(cloudWithinBoundsRelative(worldx, worldz))
-	addCloud(cityscape.scene, worldx, worldz, true)
+      if (Math.random() < cityscape.params.cloudSpawnProbability) {
+	addCloud(cityscape.scene, roundedFocusX+BOUND_X-distx, worldz, true)
+      }
+      if (Math.random() < cityscape.params.cloudSpawnProbability) {
+	addCloud(cityscape.scene, roundedFocusX-BOUND_X+distx, worldz, true)
       }
     }
   }

@@ -30,6 +30,9 @@ export function setupGUI(cityscape) {
     bloomWindowEmissivity: 0,
     bloomAmbientLightIntensity: 0,
     bloomDirLightIntensity: 0,
+    // Weather
+    windSpeed: 1/15,
+    cloudSpawnProbability: 0.05,
   }
   const gui = new GUI()
   // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements
@@ -101,6 +104,11 @@ export function setupGUI(cityscape) {
   bloomParametersFolder.add(parameters, 'bloomWindowEmissivity', 0, 2)
   bloomParametersFolder.add(parameters, 'bloomAmbientLightIntensity', 0, 2)
   bloomParametersFolder.add(parameters, 'bloomDirLightIntensity', 0, 2)
+
+  // Weather
+  const weatherParametersFolder = gui.addFolder('Weather')
+  weatherParametersFolder.add(parameters, 'windSpeed', 0, 1)
+  weatherParametersFolder.add(parameters, 'cloudSpawnProbability', 0, 0.2)
 
   // Finish
   cityscape.params = parameters
