@@ -5,11 +5,10 @@ const mouse = new THREE.Vector2()
 
 // Setup function: Set up click for changing glow effect
 export function setupClick(cityscape) {
-  const rect = cityscape.canvas.getBoundingClientRect()
-
   // Possible todo: prevent click after drag and hold
   function onMouseClick(event) {
     event.preventDefault()
+    const rect = cityscape.canvas.getBoundingClientRect()
     // Get canvas-space coordinates (-1 to 1), top left is (-1, -1)
     mouse.x = THREE.MathUtils.mapLinear(event.clientX - rect.left, 0, cityscape.canvas.clientWidth, -1, 1)
     mouse.y = -THREE.MathUtils.mapLinear(event.clientY - rect.top, 0, cityscape.canvas.clientHeight, -1, 1)
