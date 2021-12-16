@@ -89,17 +89,17 @@ export function updateLighting(cityscape) {
   }
 }
 
-const nightColor = new THREE.Color(0x171324)
-const dayColor = new THREE.Color(0x53acff)
-const duskColor = new THREE.Color(0xc87f32)
+const nightColor = new THREE.Color('#171324')
+const dayColor = new THREE.Color('#53acff')
+const duskColor = new THREE.Color('#ff9626')
 function updateBasedOnTimeOfDay(cityscape) {
   const hour = cityscape.params.timeOfDay
   const angle = (hour / 12) * Math.PI
   const sint = Math.sin(angle)
   const cost = Math.cos(angle)
-  const dayness = THREE.MathUtils.smoothstep(hour, 4, 8) * (1 - THREE.MathUtils.smoothstep(hour, 18, 20))
+  const dayness = THREE.MathUtils.smoothstep(hour, 4, 8) * (1 - THREE.MathUtils.smoothstep(hour, 19, 20))
   const duskness =
-    THREE.MathUtils.smoothstep(hour, 18, 19) * (1 - THREE.MathUtils.smoothstep(hour, 19, 21)) * 0.75
+    THREE.MathUtils.smoothstep(hour, 18, 19) * (1 - THREE.MathUtils.smoothstep(hour, 19.25, 20.75))
 
   // Light position
   dirLight.position.set(sint + 0.5 - 1.5, 0.5 - cost, -sint - 0.5 - 1.5)
