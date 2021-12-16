@@ -12,7 +12,7 @@ export function setupGUI(cityscape) {
     shadows: true,
     // Blob
     blobRadius: 4,
-    maxSpeed: 0.075,
+    maxSpeed: 0.06,
     // Camera / Renderer
     exposure: 1.02,
     zoom: 0.25,

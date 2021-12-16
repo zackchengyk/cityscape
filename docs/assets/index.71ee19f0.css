@@ -1,0 +1,1 @@
+html,body{margin:0;padding:0;height:100vh;width:100vw}body{position:fixed;inset:0;display:grid;align-content:center;justify-items:center;background-color:#0f1014}#container{position:relative;height:min(clamp(150px,48vw,720px),90vh);width:min(clamp(200px,64vw,960px),120vh)}#cityscape{position:absolute;inset:0;display:block;border-radius:10px;box-shadow:0 10px 20px #000}
