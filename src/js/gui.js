@@ -34,9 +34,9 @@ export function setupGUI(cityscape) {
     windSpeed: 1 / 50,
     cloudSpawnProbability: 0.05,
     cloudOpacity: 0.25,
+    giveCloudsBloom: true, // Must start true!
   }
   const gui = new GUI()
-  // gui.domElement.style = 'font-size: 1em' // Not consistently working for all panel elements
 
   // Unorganized parameters
   gui.add(parameters, 'autorun')
@@ -111,6 +111,15 @@ export function setupGUI(cityscape) {
   weatherParametersFolder.add(parameters, 'cloudOpacity', 0, 1).onChange((v) => {
     cityscape.shaderComposer.removePass(cityscape.shaderComposer.passes[1])
     cityscape.shaderComposer.addPass(makeNewShaderPass(cityscape, { cloudOpacity: { value: v } }))
+  })
+  let tempPass = undefined
+  weatherParametersFolder.add(parameters, 'giveCloudsBloom').onChange((v) => {
+    if (v) {
+      cityscape.cloudComposer.addPass(tempPass)
+    } else {
+      tempPass = cityscape.cloudComposer.passes[1]
+      cityscape.cloudComposer.removePass(tempPass)
+    }
   })
 
   // Finish
