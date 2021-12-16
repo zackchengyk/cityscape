@@ -22,13 +22,9 @@ const zvel = 1
 const bufferTime = 20
 const cloudThreshold = 0.5
 const cubeSize = 0.25
-let cloudShiftX = 0
-let cloudShiftZ = 0
 
 const noise = new Noise(Math.random())
 noise.seed(Math.random())
-
-const cloudSize = 10
 
 const adj = [
   [cubeSize, 0],
@@ -103,6 +99,7 @@ export function setupRain(cityscape) {
 
   rain = new THREE.Points(geometry, material)
   rain.layers.enable(1)
+  rain.frustumCulled = false
   cityscape.scene.add(rain)
 }
 
@@ -110,7 +107,7 @@ export function addCloudBlock(scene, worldX, worldZ) {
   for (let x = worldX; x < worldX + 1; x += cubeSize) {
     for (let z = worldZ; z < worldZ + 1; z += cubeSize) {
       if (Math.random() < cloudProbability) {
-	addCloud(scene, x, z, false)
+        addCloud(scene, x, z, false)
       }
     }
   }
@@ -220,9 +217,9 @@ export function updateRain(cityscape) {
       continue
     }
     visibleRain = true
-    let nx = positions[i] + xvel*cityscape.params.windSpeed
+    let nx = positions[i] + xvel * cityscape.params.windSpeed
     let ny = positions[i + 1] + yvel
-    let nz = positions[i + 2] + zvel*cityscape.params.windSpeed
+    let nz = positions[i + 2] + zvel * cityscape.params.windSpeed
     if (ny < -0.2) {
       if (cityscape.params.rain == true || Math.random() > 2 / bufferTime) {
         ny = Math.min(5.0, Math.random() * radius + radius)
@@ -261,9 +258,11 @@ function cloudWithinBoundsRelative(relativeX, relativeZ) {
 }
 
 export function updateClouds(cityscape) {
-  let cloudVelocity = new THREE.Vector3(xvel*cityscape.params.windSpeed,
-					0,
-					zvel*cityscape.params.windSpeed)
+  let cloudVelocity = new THREE.Vector3(
+    xvel * cityscape.params.windSpeed,
+    0,
+    zvel * cityscape.params.windSpeed
+  )
   cloudProbability = cityscape.params.cloudSpawnProbability
   BLOB_RADIUS = cityscape.params.blobRadius
   BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
@@ -304,12 +303,12 @@ export function updateClouds(cityscape) {
   const roundedFocusZ = Math.round(focus.z)
   if (Math.random() > cityscape.params.cloudSpawnProbability) return
   for (let distx = 0; distx <= BOUND_X; distx += cubeSize) {
-    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z+2; worldz += cubeSize) {
+    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z + 2; worldz += cubeSize) {
       if (Math.random() < cityscape.params.cloudSpawnProbability) {
-	addCloud(cityscape.scene, roundedFocusX+BOUND_X-distx, worldz, true)
+        addCloud(cityscape.scene, roundedFocusX + BOUND_X - distx, worldz, true)
       }
       if (Math.random() < cityscape.params.cloudSpawnProbability) {
-	addCloud(cityscape.scene, roundedFocusX-BOUND_X+distx, worldz, true)
+        addCloud(cityscape.scene, roundedFocusX - BOUND_X + distx, worldz, true)
       }
     }
   }
