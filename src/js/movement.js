@@ -57,7 +57,7 @@ export function updateMovement(cityscape, deltaTime) {
   // Get target velocity
   const targetVelNormalized = zeroVec3()
   for (const key in gamepad) {
-    if (gamepad[key]) {
+    if (gamepad[key] || (key == 'ArrowRight' && cityscape.params.autoMove)) {
       targetVelNormalized.add(keybindings[key])
     }
   }

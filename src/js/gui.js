@@ -18,6 +18,7 @@ export function setupGUI(cityscape) {
     zoom: 0.25,
     autoRotate: false,
     autoRotateSpeed: 0.2,
+    autoMove: false,
     // Lighting
     windowEmissivity: 1,
     ambientLightIntensity: 0.4,
@@ -81,6 +82,7 @@ export function setupGUI(cityscape) {
   cameraParametersFolder.add(parameters, 'autoRotateSpeed', 0, 20).onChange((v) => {
     cityscape.orbitControls.autoRotateSpeed = v
   })
+  cameraParametersFolder.add(parameters, 'autoMove')
 
   // Lighting parameters
   const lightParametersFolder = gui.addFolder('Lighting')
