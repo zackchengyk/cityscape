@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { darkMaterial, NEAR_PLANE, FAR_PLANE } from './config'
+import { darkMaterial, LIGHT_NEAR_PLANE, LIGHT_FAR_PLANE } from '/js/config'
 
 let ambientLight, dirLight
 let planeMesh, planeMaterial
@@ -25,7 +25,7 @@ export function setupLighting(cityscape) {
   // Directional light's shadows
   dirLight.castShadow = true
   const r = cityscape.params.blobRadius * 1.5
-  dirLight.shadow.camera = new THREE.OrthographicCamera(-r, r, r, -r, NEAR_PLANE, FAR_PLANE)
+  dirLight.shadow.camera = new THREE.OrthographicCamera(-r, r, r, -r, LIGHT_NEAR_PLANE, LIGHT_FAR_PLANE)
   const dim = r * 100
   dirLight.shadow.mapSize = new THREE.Vector2(dim, dim)
   dirLight.shadow.bias = -0.0001
