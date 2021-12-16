@@ -95,7 +95,7 @@ const dayColor = new THREE.Color('#53acff')
 const duskColor = new THREE.Color('#ff9626')
 function updateBasedOnTimeOfDay(cityscape) {
   const hour = cityscape.params.timeOfDay
-  const angle = (hour / 12) * Math.PI
+  const angle = (Math.PI * (hour + 0.5)) / 13 // sunrise at 6am, sunset at 7pm --- not a valid loop at night!
   const sint = Math.sin(angle)
   const cost = Math.cos(angle)
   const dayness = THREE.MathUtils.smoothstep(hour, 4, 8) * (1 - THREE.MathUtils.smoothstep(hour, 19, 20))
@@ -106,8 +106,14 @@ function updateBasedOnTimeOfDay(cityscape) {
   dirLight.position.set(sint + 0.5 - 1.5, 0.5 - cost, -sint - 0.5 - 1.5)
 
   // Light parameters
-  cityscape.params.ambientLightIntensity = THREE.MathUtils.mapLinear(dayness, 0, 1, 0.1, 0.5)
-  cityscape.params.dirLightIntensity = THREE.MathUtils.mapLinear(dirLight.position.y, -0.5, 0.5, 0, 0.25)
+  cityscape.params.ambientLightIntensity = THREE.MathUtils.mapLinear(dayness * dayness, -0.5, 1.5, 0.1, 0.5)
+  cityscape.params.dirLightIntensity = THREE.MathUtils.mapLinear(
+    dirLight.position.y + duskness,
+    -0.5,
+    3,
+    0,
+    1.25
+  )
   cityscape.params.bloomAmbientLightIntensity = THREE.MathUtils.mapLinear(-dayness, -1, 0, 0, 0.5)
   cityscape.params.bloomDirLightIntensity = 0
 
