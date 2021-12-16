@@ -1,4 +1,4 @@
-import * as THREE from '../../node_modules/three/src/Three'
+import * as THREE from 'three'
 import { Noise } from 'noisejs'
 
 export const PHI = 1.618

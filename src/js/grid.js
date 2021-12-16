@@ -1,4 +1,4 @@
-import * as THREE from '../../node_modules/three/src/Three'
+import * as THREE from 'three'
 import { clearBox, updateBox, fillWithBox, enableBloomModeBox, disableBloomModeBox } from '/js/box'
 import { focus, getSpeed } from '/js/movement'
 import { generateStreets, isStreetPosition } from '/js/streets'

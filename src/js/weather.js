@@ -1,4 +1,4 @@
-import * as THREE from '../../node_modules/three/src/Three'
+import * as THREE from 'three'
 import { mergeBufferGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { focus, getSpeed } from '/js/movement'
 import { rainDensity } from '/js/config'

@@ -1,5 +1,6 @@
 export default {
   root: './src',
+  base: '/l-cityscape/',
   build: {
     outDir: '../docs',
     rollupOptions: {
