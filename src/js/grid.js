@@ -73,7 +73,8 @@ export function updateGrid(cityscape) {
   ) {
     return
   }
-  const maxOfPrevAndNewBR = Math.max(prevBlobRadius, blobRadius)
+  let maxOfPrevAndNewBR = Math.max(prevBlobRadius, blobRadius)
+  maxOfPrevAndNewBR++ // Just in case
   prevBlobRadius = blobRadius
   prevFocusX = focusX
   prevFocusZ = focusZ

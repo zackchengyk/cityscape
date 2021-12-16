@@ -1,6 +1,7 @@
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { MIN_ZOOM, MAX_ZOOM } from '/js/config'
+import { setMaxSpeed } from '/js/movement'
 
 export function setupGUI(cityscape) {
   // Start up
@@ -10,7 +11,9 @@ export function setupGUI(cityscape) {
     timeOfDay: 12,
     shadows: true,
     rain: false,
+    // Blob
     blobRadius: 4,
+    maxSpeed: 0.075,
     // Camera / Renderer
     exposure: 1.02,
     zoom: 0.25,
@@ -54,12 +57,16 @@ export function setupGUI(cityscape) {
     cityscape.shaderComposer.removePass(cityscape.shaderComposer.passes[1])
     cityscape.shaderComposer.addPass(new ShaderPass(existingShaderMaterial, 'boxesTexture'))
   })
-  gui.add(parameters, 'blobRadius', 0, 8).step(1)
 
   // Unorganized parameters
   gui.add(parameters, 'timeOfDay', 0, 24)
   gui.add(parameters, 'shadows')
   gui.add(parameters, 'rain')
+
+  // Blob
+  const blobParametersFolder = gui.addFolder('Blob')
+  blobParametersFolder.add(parameters, 'blobRadius', 0, 12).step(1)
+  blobParametersFolder.add(parameters, 'maxSpeed', 0.025, 1).onChange((v) => setMaxSpeed(v))
 
   // Camera / renderer parameters
   const cameraParametersFolder = gui.addFolder('Camera / Renderer')

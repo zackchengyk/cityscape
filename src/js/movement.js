@@ -6,12 +6,15 @@ const zeroVec3 = () => new THREE.Vector3(0, 0, 0)
 const movementProperties = {
   _velocity: zeroVec3(),
   _worldPosition: zeroVec3(),
-  _maxSpeed: 0.075,
+  _maxSpeed: undefined,
   _accLam: 0.0025,
   _toZeroAccLamModifier: 1.25,
 }
 export const focus = movementProperties._worldPosition
 export const getSpeed = () => movementProperties._velocity.length()
+export const setMaxSpeed = (v) => {
+  movementProperties._maxSpeed = v
+}
 
 // Keybindings
 const keybindings = {
@@ -29,7 +32,8 @@ const keybindings = {
 const gamepad = {}
 
 // Setup function: Set up gamepad and listeners for gamepad
-export function setupMovement(_) {
+export function setupMovement(cityscape) {
+  movementProperties._maxSpeed = cityscape.params.maxSpeed
   // Event handler function to set the gamepad's key to a certain value
   function toggleGamepadValue(event, key, value) {
     if (event.key === key) {

@@ -18,16 +18,8 @@ export function animate(cityscape, currTime) {
 
   // Increment time
   if (cityscape.params.autorun) {
-    cityscape.params.timeOfDay += deltaTime / 250
+    cityscape.params.timeOfDay += deltaTime / 500
     cityscape.params.timeOfDay = cityscape.params.timeOfDay % 24
-    // Update display
-    cityscape.gui.children.forEach((x) => {
-      if (x.children) {
-        x.children.forEach((y) => y.updateDisplay())
-      } else {
-        x.updateDisplay()
-      }
-    })
   }
 
   // Update things
@@ -44,6 +36,15 @@ export function animate(cityscape, currTime) {
 
   // Render (+ outlines) to screen
   renderToScreen(cityscape)
+
+  // Update display
+  cityscape.gui.children.forEach((x) => {
+    if (x.children) {
+      x.children.forEach((y) => y.updateDisplay())
+    } else {
+      x.updateDisplay()
+    }
+  })
 
   cityscape.stats.end()
 }
