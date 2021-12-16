@@ -9,6 +9,7 @@ let BLOB_RADIUS_SQUARED
 let BOUND_X
 let BOUND_Z
 
+let cloudProbability = 0
 let maxClouds = 40
 let rain = null
 let Clouds = new Set()
@@ -108,7 +109,9 @@ export function setupRain(cityscape) {
 export function addCloudBlock(scene, worldX, worldZ) {
   for (let x = worldX; x < worldX + 1; x += cubeSize) {
     for (let z = worldZ; z < worldZ + 1; z += cubeSize) {
-      if (addCloud(scene, x, z, false)) return
+      if (Math.random() < cloudProbability) {
+	addCloud(scene, x, z, false)
+      }
     }
   }
 }
@@ -148,10 +151,12 @@ function addCloud(scene, worldX, worldZ, jitter) {
       emissiveIntensity: 0.17,
     })
   )
-  cloud.position.set(worldX, Math.random() * 2 + 3, worldZ)
+  cloud.position.set(worldX - focus.x, Math.random() * 2 + 3, worldZ - focus.z)
   cloud.castShadow = false
   cloud.receiveShadow = false
   let worldPos = cloud.position.clone()
+  worldPos.x += focus.x
+  worldPos.z += focus.z
   Clouds.add({ cloud: cloud, _worldPosition: worldPos, positions: positions })
 
   cloud.layers.set(3)
@@ -172,6 +177,7 @@ function xzToKey(x, z) {
 }
 
 export function setupClouds(cityscape) {
+  cloudProbability = cityscape.params.cloudSpawnProbability
   BLOB_RADIUS = cityscape.params.blobRadius
   BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
   BOUND_X = BLOB_RADIUS
@@ -214,26 +220,26 @@ export function updateRain(cityscape) {
       continue
     }
     visibleRain = true
-    let nx = positions[i] + xvel
+    let nx = positions[i] + xvel*cityscape.params.windSpeed
     let ny = positions[i + 1] + yvel
-    let nz = positions[i + 2] + zvel
+    let nz = positions[i + 2] + zvel*cityscape.params.windSpeed
     if (ny < -0.2) {
       if (cityscape.params.rain == true || Math.random() > 2 / bufferTime) {
-        ny = Math.random() * radius + radius
+        ny = Math.min(5.0, Math.random() * radius + radius)
       }
       nx = Math.random() * diameter - radius
       nz = Math.random() * diameter - radius
     }
-    if (nx > radius - xvel * ny) {
+    if (nx > radius) {
       nx -= diameter
     }
-    if (nx < -radius - xvel * ny) {
+    if (nx < -radius) {
       nx += diameter
     }
-    if (nz > radius - zvel * ny) {
+    if (nz > radius) {
       nz -= diameter
     }
-    if (nz < -radius - zvel * ny) {
+    if (nz < -radius) {
       nz += diameter
     }
     positions[i] = nx
@@ -251,13 +257,14 @@ export function updateRain(cityscape) {
 
 function cloudWithinBoundsRelative(relativeX, relativeZ) {
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  return BLOB_RADIUS_SQUARED + 10 > distanceSquared
+  return BLOB_RADIUS_SQUARED + 5 > distanceSquared
 }
 
 export function updateClouds(cityscape) {
   let cloudVelocity = new THREE.Vector3(xvel*cityscape.params.windSpeed,
 					0,
 					zvel*cityscape.params.windSpeed)
+  cloudProbability = cityscape.params.cloudSpawnProbability
   BLOB_RADIUS = cityscape.params.blobRadius
   BLOB_RADIUS_SQUARED = BLOB_RADIUS * BLOB_RADIUS
   BOUND_X = BLOB_RADIUS
@@ -297,7 +304,7 @@ export function updateClouds(cityscape) {
   const roundedFocusZ = Math.round(focus.z)
   if (Math.random() > cityscape.params.cloudSpawnProbability) return
   for (let distx = 0; distx <= BOUND_X; distx += cubeSize) {
-    for (let worldz = roundedFocusZ - BOUND_Z - 1; worldz < roundedFocusZ - BOUND_Z; worldz += cubeSize) {
+    for (let worldz = roundedFocusZ - BOUND_Z; worldz < roundedFocusZ - BOUND_Z+2; worldz += cubeSize) {
       if (Math.random() < cityscape.params.cloudSpawnProbability) {
 	addCloud(cityscape.scene, roundedFocusX+BOUND_X-distx, worldz, true)
       }
