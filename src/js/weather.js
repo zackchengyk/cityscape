@@ -9,6 +9,7 @@ let BLOB_RADIUS_SQUARED
 let BOUND_X
 let BOUND_Z
 
+let maxClouds = 40
 const cloudProbability = 0.05
 let rain = null
 let Clouds = new Set()
@@ -101,21 +102,29 @@ export function setupRain(cityscape) {
 export function addCloudBlock(scene, worldX, worldZ) {
   for (let x = worldX; x < worldX + 1; x += cubeSize) {
     for (let z = worldZ; z < worldZ + 1; z += cubeSize) {
-      if (addCloud(scene, x, z))
+      if (addCloud(scene, x, z, false))
 	return
     }
   }
 }
 
-function addCloud(scene, worldX, worldZ) {
+function addCloud(scene, worldX, worldZ, jitter) {
+  console.log(Clouds.size)
   if (cloudPositions.has(xzToKey(worldX, worldZ))) return
-  let { positions, visited, minX, maxX, minZ, maxZ } = cloudFloodFill(worldX, worldZ)
+  if (!cloudWithinBoundsRelative(worldX-focus.x, worldZ-focus.z)) return
+  if (Clouds.size >= maxClouds) return
+  let x = worldX, z = worldZ
+  if (jitter) {
+    x += Math.round(Math.random()*1000) + 1000
+    z += Math.round(Math.random()*1000) + 1000
+  }
+  let { positions, visited, minX, maxX, minZ, maxZ } = cloudFloodFill(x, z)
   if (positions.size == 0) return false
   let geometry = null
 
   for (let cubex = minX; cubex <= maxX; cubex += cubeSize) {
     for (let cubez = minZ; cubez <= maxZ; cubez += cubeSize) {
-      if (!positions.has(xzToKey(worldX+cubex, worldZ+cubez))) continue
+      if (!positions.has(xzToKey(x+cubex, z+cubez))) continue
       let box = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
       box.translate(cubex, 0, cubez)
       box.rotateY(Math.PI)
@@ -132,9 +141,9 @@ function addCloud(scene, worldX, worldZ) {
     geometry,
     new THREE.MeshPhongMaterial({
       emissive: '#ffffff',
-      emissiveIntensity: 0.11,
+      emissiveIntensity: 0.17,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.5,
     })
   )
   cloud.position.set(worldX, Math.random() * 2 + 3, worldZ)
@@ -142,7 +151,7 @@ function addCloud(scene, worldX, worldZ) {
   cloud.receiveShadow = false
   let worldPos = cloud.position.clone()
   Clouds.add({cloud: cloud, _worldPosition: worldPos, positions: positions})
-
+  
   cloud.layers.enable(0)
   cloud.layers.enable(1)
   scene.add(cloud)
@@ -183,7 +192,7 @@ export function setupClouds(cityscape) {
   // Iterate over grid cells
   for (let worldX = roundedFocusX - BOUND_X; worldX <= roundedFocusX + BOUND_X; worldX += cubeSize) {
     for (let worldZ = roundedFocusZ - BOUND_Z; worldZ <= roundedFocusZ + BOUND_Z; worldZ += cubeSize) {
-      addCloud(cityscape.scene, worldX, worldZ)
+      addCloud(cityscape.scene, worldX, worldZ, false)
     }
   }
   //kvPairsToDelete.forEach((key) => gridCellMap.delete(key))
@@ -238,7 +247,7 @@ export function updateRain(cityscape) {
 
 function cloudWithinBoundsRelative(relativeX, relativeZ) {
   const distanceSquared = relativeX * relativeX + relativeZ * relativeZ
-  return BLOB_RADIUS_SQUARED + 5 > distanceSquared
+  return BLOB_RADIUS_SQUARED + 10 > distanceSquared
 }
 
 export function updateClouds(cityscape) {
@@ -280,9 +289,13 @@ export function updateClouds(cityscape) {
   // Add clouds to the edge
   const roundedFocusX = Math.round(focus.x)
   const roundedFocusZ = Math.round(focus.z)
+  if (Math.random() > cloudProbability) return
   for (let worldx = roundedFocusX - BOUND_X; worldx <= roundedFocusX + BOUND_X; worldx += cubeSize) {
-    if (Math.random() > cloudProbability) {
-      //addCloudBlock(cityscape.scene, worldx, roundedFocusZ - BOUND_Z)
+    for (let worldz = roundedFocusZ - BOUND_Z - 1; worldz < roundedFocusZ - BOUND_Z; worldz += cubeSize) {
+      if (Math.random() < cloudProbability) {
+	console.log(cloudWithinBoundsRelative(worldx, worldz))
+	addCloud(cityscape.scene, worldx, worldz, true)
+      }
     }
   }
 }
