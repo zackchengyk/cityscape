@@ -12,13 +12,15 @@ let BOUND_Z
 let cloudProbability = 0
 let maxClouds = 40
 let rain = null
+let rainPositions = []
 let Clouds = new Set()
 let cloudPositions = new Set()
 let diameter
 let radius
 const xvel = 0
-const yvel = -0.2
+const yvel = -0.03
 const zvel = 1
+const zvelRain = 0.2
 const bufferTime = 20
 const cloudThreshold = 0.5
 const cubeSize = 0.25
@@ -83,12 +85,17 @@ export function setupRain(cityscape) {
   for (let i = 0; i < rainDensity; i++) {
     const droplet = new THREE.Vector3(
       getRandomPos(),
-      Math.random() * radius * bufferTime + radius,
+      -0.2,
       getRandomPos()
     )
     droplets.push(droplet)
   }
   let geometry = new THREE.BufferGeometry().setFromPoints(droplets)
+  rainPositions = droplets
+  rainPositions.forEach((v) => {
+    v.x += focus.x
+    v.z += focus.z
+  })
 
   let material = new THREE.PointsMaterial({
     color: 0xcccccc,
@@ -212,36 +219,36 @@ export function updateRain(cityscape) {
   if (rain == null) return
   const positions = rain.geometry.attributes.position.array
   let visibleRain = false
-  for (let i = 0; i < positions.length; i += 3) {
-    if (cityscape.params.rain == false && positions[i + 1] < -0.2) {
+  for (let i = 0; i < rainPositions.length; i++) {
+    if (cityscape.params.rain == false && rainPositions[i].y < -0.2) {
       continue
     }
     visibleRain = true
-    let nx = positions[i] + xvel * cityscape.params.windSpeed
-    let ny = positions[i + 1] + yvel
-    let nz = positions[i + 2] + zvel * cityscape.params.windSpeed
-    if (ny < -0.2) {
-      if (cityscape.params.rain == true || Math.random() > 2 / bufferTime) {
-        ny = Math.min(5.0, Math.random() * radius + radius)
+    rainPositions[i].x += xvel*cityscape.params.windSpeed
+    rainPositions[i].y += yvel
+    rainPositions[i].z += zvelRain*cityscape.params.windSpeed
+    if (rainPositions[i].y < -0.2) {
+      if (Math.random() < 1 / bufferTime) {
+        rainPositions[i].y = Math.min(4.5, Math.random() * radius + radius)
       }
-      nx = Math.random() * diameter - radius
-      nz = Math.random() * diameter - radius
+      rainPositions[i].x = focus.x + Math.random() * diameter - radius
+      rainPositions[i].z = focus.z + Math.random() * diameter - radius
     }
-    if (nx > radius) {
-      nx -= diameter
+    if (rainPositions[i].x - focus.x > radius) {
+      rainPositions[i].x -= diameter
     }
-    if (nx < -radius) {
-      nx += diameter
+    if (rainPositions[i].x - focus.x < -radius) {
+      rainPositions[i].x += diameter
     }
-    if (nz > radius) {
-      nz -= diameter
+    if (rainPositions[i].z - focus.z > radius) {
+      rainPositions[i].z -= diameter
     }
-    if (nz < -radius) {
-      nz += diameter
+    if (rainPositions[i].z - focus.z < -radius) {
+      rainPositions[i].z += diameter
     }
-    positions[i] = nx
-    positions[i + 1] = ny
-    positions[i + 2] = nz
+    positions[i*3] = rainPositions[i].x - focus.x
+    positions[i*3 + 1] = rainPositions[i].y
+    positions[i*3 + 2] = rainPositions[i].z - focus.z
   }
   rain.geometry.attributes.position.needsUpdate = true
   if (cityscape.params.rain == false && visibleRain == false) {
