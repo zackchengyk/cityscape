@@ -88,7 +88,7 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
   windowGroup.position.copy(boxMesh.position)
   if (windowGroup) addToScene(windowGroup)
   // Add to map and scene
-  addToGridCellMap({
+  const gridCellObject = {
     type: 'box',
     worldX,
     worldZ,
@@ -98,25 +98,15 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     outlineMesh1,
     outlineMesh2,
     windowGroup,
-  })
+  }
+  addToGridCellMap(gridCellObject)
   boxMesh.callback = () => {
-    // addToGridCellMap({
-    //   type: 'box',
-    //   worldX,
-    //   worldZ,
-    //   isGlowing: true,
-    //   actualHeight,
-    //   boxMesh,
-    //   outlineMesh1,
-    //   outlineMesh2,
-    //   windowGroup,
-    // })
-    boxMesh.layers.toggle(1)
-    console.log('Yeehaw')
+    gridCellObject.isGlowing = !gridCellObject.isGlowing
   }
   addToScene(boxMesh)
-  boxMesh.layers.enable(0)
-  boxMesh.layers.enable(1)
+  boxMesh.layers.enable(0) // Bloom
+  boxMesh.layers.enable(1) // Scene
+  boxMesh.layers.enable(2) // Clicking (see click.js)
 }
 
 // Todo? perhaps these should be GUI variables

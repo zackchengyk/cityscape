@@ -1,29 +1,22 @@
 import * as THREE from 'three'
 
-var raycaster = new THREE.Raycaster()
+const raycaster = new THREE.Raycaster()
+const mouse = new THREE.Vector2()
 
-var mouse = new THREE.Vector2()
-// Setup function: Set up click for bloom effects
+// Setup function: Set up click for changing glow effect
 export function setupClick(cityscape) {
+  const rect = cityscape.canvas.getBoundingClientRect()
+
+  // Possible todo: prevent click after drag and hold
   function onMouseClick(event) {
     event.preventDefault()
-    mouse.x = THREE.MathUtils.mapLinear(
-      event.clientX - cityscape.canvas.getBoundingClientRect().left,
-      0,
-      cityscape.canvas.clientWidth,
-      -1,
-      1
-    )
-    mouse.y = -THREE.MathUtils.mapLinear(
-      event.clientY - cityscape.canvas.getBoundingClientRect().top,
-      0,
-      cityscape.canvas.clientHeight,
-      -1,
-      1
-    )
-
+    // Get canvas-space coordinates (-1 to 1), top left is (-1, -1)
+    mouse.x = THREE.MathUtils.mapLinear(event.clientX - rect.left, 0, cityscape.canvas.clientWidth, -1, 1)
+    mouse.y = -THREE.MathUtils.mapLinear(event.clientY - rect.top, 0, cityscape.canvas.clientHeight, -1, 1)
+    // Ray-cast
     raycaster.setFromCamera(mouse, cityscape.camera)
-    var intersects = raycaster.intersectObjects(cityscape.scene.children)
+    raycaster.layers.set(2)
+    const intersects = raycaster.intersectObjects(cityscape.scene.children)
     for (let i of intersects) {
       if (i?.object?.callback) {
         i.object.callback()

@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { NEAR_PLANE, FAR_PLANE, MIN_ZOOM, MAX_ZOOM } from '/js/config'
+import { CAMERA_POSITION, NEAR_PLANE, FAR_PLANE, MIN_ZOOM, MAX_ZOOM } from '/js/config'
 import { setupGrid } from '/js/grid'
 import { setupGUI } from '/js/gui'
 import { setupLighting } from '/js/lighting'
@@ -97,7 +97,7 @@ function setupCameraSceneRendererComposer(cityscape) {
   // Camera
   cityscape.camera = new THREE.OrthographicCamera(-aspectRatio, aspectRatio, 1, -1, NEAR_PLANE, FAR_PLANE)
   cityscape.camera.zoom = cityscape.params.zoom
-  cityscape.camera.position.set(1, 1, 1)
+  cityscape.camera.position.copy(CAMERA_POSITION)
   cityscape.camera.lookAt(0, 0, 0)
   cityscape.camera.updateProjectionMatrix()
 
