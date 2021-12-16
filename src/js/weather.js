@@ -151,10 +151,12 @@ function addCloud(scene, worldX, worldZ, jitter) {
       emissiveIntensity: 0.17,
     })
   )
-  cloud.position.set(worldX, Math.random() * 2 + 3, worldZ)
+  cloud.position.set(worldX - focus.x, Math.random() * 2 + 3, worldZ - focus.z)
   cloud.castShadow = false
   cloud.receiveShadow = false
   let worldPos = cloud.position.clone()
+  worldPos.x += focus.x
+  worldPos.z += focus.z
   Clouds.add({ cloud: cloud, _worldPosition: worldPos, positions: positions })
 
   cloud.layers.set(3)
