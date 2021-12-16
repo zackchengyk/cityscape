@@ -100,17 +100,18 @@ export function fillWithBox(addToScene, addToGridCellMap, worldX, worldZ, scale)
     windowGroup,
   })
   boxMesh.callback = () => {
-    addToGridCellMap({
-      type: 'box',
-      worldX,
-      worldZ,
-      isGlowing: true,
-      actualHeight,
-      boxMesh,
-      outlineMesh1,
-      outlineMesh2,
-      windowGroup,
-    })
+    // addToGridCellMap({
+    //   type: 'box',
+    //   worldX,
+    //   worldZ,
+    //   isGlowing: true,
+    //   actualHeight,
+    //   boxMesh,
+    //   outlineMesh1,
+    //   outlineMesh2,
+    //   windowGroup,
+    // })
+    boxMesh.layers.toggle(1)
     console.log('Yeehaw')
   }
   addToScene(boxMesh)

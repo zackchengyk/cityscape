@@ -48,6 +48,7 @@ export function setupLighting(cityscape) {
   planeMesh.layers.enable(1)
   planeMesh.renderOrder = -999
   updateBasedOnTimeOfDay(cityscape) // style: why is this here lmao
+  planeMesh.callback = () => undefined
   cityscape.scene.add(planeMesh)
 }
 
