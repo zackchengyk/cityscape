@@ -10,7 +10,7 @@ body {
   position: fixed;
   inset: 0;
   display: grid;
-  align-items: center;
+  align-content: center;
   justify-items: center;
   background-color: #0f1014;
 }
