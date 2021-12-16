@@ -6,6 +6,7 @@ import { updateMovement } from '/js/movement'
 import { updateRain, updateClouds } from '/js/weather'
 
 let prevTime = 0
+let prevS = 0
 
 // Animate function
 export function animate(cityscape, currTime) {
@@ -20,6 +21,14 @@ export function animate(cityscape, currTime) {
   if (cityscape.params.autorun) {
     cityscape.params.timeOfDay += deltaTime / 500
     cityscape.params.timeOfDay = cityscape.params.timeOfDay % 24
+  }
+
+  // Update camera near and far
+  const s = 10 / cityscape.params.zoom
+  if (prevS !== s) {
+    prevS = s
+    cityscape.camera.near = 120 - s
+    cityscape.camera.far = 120 + s
   }
 
   // Update things

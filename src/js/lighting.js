@@ -38,9 +38,10 @@ export function setupLighting(cityscape) {
     color: 0x171324,
     emissive: 0x171324,
     emissiveIntensity: 0.5,
+    side: THREE.DoubleSide,
   })
   planeMesh = new THREE.Mesh(planeGeometry, planeMaterial)
-  const s = 5 / cityscape.params.zoom
+  const s = 100 / cityscape.params.zoom
   planeMesh.scale.set(s, s, s)
   planeMesh.rotation.x = -Math.PI / 2
   planeMesh.receiveShadow = true
@@ -48,7 +49,7 @@ export function setupLighting(cityscape) {
   planeMesh.layers.enable(1)
   planeMesh.renderOrder = -999
   updateBasedOnTimeOfDay(cityscape) // style: why is this here lmao
-  planeMesh.callback = () => undefined
+  planeMesh.callback = () => undefined // important!
   cityscape.scene.add(planeMesh)
 }
 
@@ -63,7 +64,7 @@ export function updateLighting(cityscape) {
   }
   if (prevZoom !== cityscape.params.zoom) {
     prevZoom = cityscape.params.zoom
-    const s = 5 / cityscape.params.zoom
+    const s = 100 / cityscape.params.zoom
     planeMesh.scale.set(s, s, s)
     planeMesh.updateMatrix()
   }
