@@ -135,7 +135,6 @@ function setupCameraSceneRendererComposer(cityscape) {
   cityscape.cloudComposer = new EffectComposer(cityscape.renderer)
   cityscape.cloudComposer.renderToScreen = false // will render to cityscape.cloudComposer.renderTarget2.texture
   cityscape.cloudComposer.addPass(renderPass)
-  cityscape.cloudComposer.addPass(unrealBloomPass)
 
   // Bloom composer (A + B)
   cityscape.bloomComposer = new EffectComposer(cityscape.renderer)
