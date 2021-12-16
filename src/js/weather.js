@@ -223,21 +223,21 @@ export function updateRain(cityscape) {
     let nz = positions[i + 2] + zvel*cityscape.params.windSpeed
     if (ny < -0.2) {
       if (cityscape.params.rain == true || Math.random() > 2 / bufferTime) {
-        ny = Math.random() * radius + radius
+        ny = Math.min(5.0, Math.random() * radius + radius)
       }
       nx = Math.random() * diameter - radius
       nz = Math.random() * diameter - radius
     }
-    if (nx > radius - xvel * ny) {
+    if (nx > radius) {
       nx -= diameter
     }
-    if (nx < -radius - xvel * ny) {
+    if (nx < -radius) {
       nx += diameter
     }
-    if (nz > radius - zvel * ny) {
+    if (nz > radius) {
       nz -= diameter
     }
-    if (nz < -radius - zvel * ny) {
+    if (nz < -radius) {
       nz += diameter
     }
     positions[i] = nx
