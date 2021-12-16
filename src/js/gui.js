@@ -22,13 +22,13 @@ export function setupGUI(cityscape) {
     windowEmissivity: 1,
     ambientLightIntensity: 0.4,
     dirLightIntensity: 0.6,
+    bloomWindowEmissivity: 0,
+    bloomAmbientLightIntensity: 0,
+    bloomDirLightIntensity: 0,
     // Bloom
     bloomStrength: 1.5,
     bloomRadius: 0,
     bloomThreshold: 0.075,
-    bloomWindowEmissivity: 0,
-    bloomAmbientLightIntensity: 0,
-    bloomDirLightIntensity: 0,
     // Weather
     rain: false,
     windSpeed: 1 / 50,
@@ -87,6 +87,9 @@ export function setupGUI(cityscape) {
   lightParametersFolder.add(parameters, 'windowEmissivity', 0, 2)
   lightParametersFolder.add(parameters, 'ambientLightIntensity', 0, 2)
   lightParametersFolder.add(parameters, 'dirLightIntensity', 0, 2)
+  lightParametersFolder.add(parameters, 'bloomWindowEmissivity', 0, 2)
+  lightParametersFolder.add(parameters, 'bloomAmbientLightIntensity', 0, 2)
+  lightParametersFolder.add(parameters, 'bloomDirLightIntensity', 0, 2)
 
   // Bloom parameters
   const bloomParametersFolder = gui.addFolder('Bloom')
@@ -99,9 +102,6 @@ export function setupGUI(cityscape) {
   bloomParametersFolder.add(parameters, 'bloomThreshold', 0, 2).onChange((v) => {
     cityscape.bloomComposer.passes[1].threshold = v
   })
-  bloomParametersFolder.add(parameters, 'bloomWindowEmissivity', 0, 2)
-  bloomParametersFolder.add(parameters, 'bloomAmbientLightIntensity', 0, 2)
-  bloomParametersFolder.add(parameters, 'bloomDirLightIntensity', 0, 2)
 
   // Weather
   const weatherParametersFolder = gui.addFolder('Weather')
